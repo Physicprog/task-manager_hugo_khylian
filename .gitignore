@@ -1,0 +1,7 @@
+./task-manager-frontend/.env
+./task-manager-backend/.env
+.node_modules
+./task-manager-frontend/node_modules
+./task-manager-frontend/package-lock.json
+
+**/node_modules

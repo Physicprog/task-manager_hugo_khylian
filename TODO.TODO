@@ -1,0 +1,99 @@
+Les elements qui ont ete utiliser:
+
+
+
+
+React = useEffect, useState, UseNavigate, RouterDom
+Tailwind  = pour le Style avec autoPrefixer
+Axios = pour les appels API
+Strapi en backend local
+AOS = pour les animations
+Google Icon = pour les icons
+
+
+La liste des commandes effectuer pour initialiser le projet:
+
+1 - Installer Node.js 
+ https://nodejs.org/
+
+2 - Installer VS commandes
+ https://code.visualstudio.com/
+
+
+
+
+2 - Initialiser le projet Strapi 
+npx create-strapi-app task-manager-backend
+cd task-manager-backend
+strapi develop
+
+
+
+
+3 - Initialiser le projet React
+npx create-react-app task-manager-frontend
+cd task-manager-frontend
+npm install -D tailwindcss postcss autoprefixer
+
+
+
+4 - Initialiser Tailwind CSS
+npx tailwindcss init -p
+
+Ajout le package pour l'autoprefixer:
+npm install -D autoprefixer
+
+
+5 - Installer les dépendances supplémentaires pour le frontend
+npm install axios react-router-dom
+
+    
+
+Pour lancer le projet:
+
+Frontend:
+cd task-manager-frontend
+npm run dev
+
+Backend:
+cd task-manager-backend
+npm run dev
+
+Pour lancer les 2 en même temps, ouvrir 2 terminaux (ou split):
+cd task-manager-backend
+npm run dev
+
+
+cd ..
+cd task-manager-frontend
+npm run dev
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+choix techniques:
+pk axios ?
+car facile a utiliser (get, post, put, delete) et par rapport a fetch il gere mieux les erreurs et les reponses json automatiquement, plus rapide
+defaut: 
+pas natif, besoin d'installer une dependance supplementaire
+
+pk tailwind ?
+car permet de faire du css rapide et efficace avec des classes utilitaires, pas besoin d'ecrire du css complexe, plus adapter a des composants react.
+defaut:
+besoin d'apprendre une nouvelle syntaxe, se repete parfois, moins flexible
+
+pk strapi ?
+car permet de creer un backend rapidement avec une interface d'administration, gestion des utilisateurs, roles, permissions, api automatique, adapter pour un projet comme celui ci
+defaut:
+peut etre lourd pour des petits projets, besoin de comprendre son fonctionnement, probleme de gestion pour creer, modifier etc...

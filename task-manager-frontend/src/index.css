@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#notification {
+    position: fixed;
+    text-align: center;
+    height: auto;
+    padding: 1.5vh 1vh;
+    font-size: 0.8rem;
+    padding-bottom: 1.8vh;
+    width: 15%;
+    background-color: var(--gray);
+    backdrop-filter: blur(6.5px);
+    bottom: 2vh;
+    right: 2vh;
+    color: var(--white);
+    transform: translateX(120%) scale(1);
+    z-index: 9999999999999;
+    user-select: none;
+    border-radius: 1vh;
+    box-shadow: 0px 0px 2vh rgba(0, 0, 0, 0.397);
+    border-right: var(--green) 0.5vh solid;
+    opacity: 0%;
+    transition: all 300ms cubic-bezier(.77, .01, .32, 1);
+    cursor: pointer;
+}
+
+#notification:hover {
+    transform: translateX(0%) scale(1.05) !important;
+    background-color: var(--gray-light);
+    transition: all 200ms ease-out;
+}
+
+#notification:active {
+    transform: translateX(0) scale(0.95);
+    opacity: 100%;
+}
+
+/* utility classes pour les accents car Tailwind voulait pas les prendres*/
+@layer utilities {
+    .bg-accent1 {
+        background-color: var(--color-accent-main);
+    }
+
+    .bg-navbar {
+        background-color: var(--navbar-color);
+    }
+
+    .bg-accentMain {
+        background-color: var(--color-accent-main);
+    }
+
+    .bg-accentLight {
+        background-color: var(--color-accent-light);
+    }
+
+    .text-accent1 {
+        color: var(--color-accent-main);
+    }
+
+    .text-accentLight {
+        color: var(--color-accent-light);
+    }
+
+}
+
+@font-face {
+    font-family: 'Museosans';
+    src: url('./assets/font/museosans.ttf') format('truetype');
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Museosans', sans-serif;
+    background-color: var(--color-surface);
+    color: var(--font-color);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    min-height: 100vh;
+    width: 100%;
+    max-width: 100vw;
+}
+
+
+.theme-light {
+    --color-primary: #4c3fb8;
+    --color-secondary: #ffffff;
+    --font-color: #1f2937;
+    --color-surface: #f9f9f9;
+    --gray: #979797;
+    --gray-light: #989696;
+    --navbar-color: #2fff00e4;
+    --white: #ffffff;
+    --green: rgb(157, 204, 63);
+    --red: rgb(225, 25, 25);
+    --color-accent-main: rgb(142, 16, 221);
+    --color-accent-light: rgb(162, 51, 231);
+    --label-red: #ff4d4d;
+    --label-blue: #4d79ff;
+    --label-green: #4dff88;
+    --label-yellow: #ffd24d;
+    --label-purple: #b84dff;
+    --label-orange: #ff944d;
+    --label-pink: #ff4db6;
+}
+
+.theme-dark {
+    --color-primary: #6b5dd436;
+    --color-secondary: #111827;
+    --font-color: #f9fafb;
+    --color-surface: #1f2937;
+    --navbar-color: #463f50e4;
+    --gray: #525252;
+    --gray-light: #232323;
+    --white: #ffffff;
+    --green: rgb(157, 204, 63);
+    --red: rgb(225, 25, 25);
+    --color-accent-main: rgb(142, 16, 221);
+    --color-accent-light: rgb(162, 51, 231);
+    --label-red: #ff4d4d;
+    --label-blue: #4d79ff;
+    --label-green: #4dff88;
+    --label-yellow: #ffd24d;
+    --label-purple: #b84dff;
+    --label-orange: #ff944d;
+    --label-pink: #ff4db6;
+}
+
+
+strong {
+    font-weight: 600;
+    text-decoration: underline 2px var(--color-accent-main);
+}

@@ -4,4 +4,5 @@
 ./task-manager-frontend/node_modules
 ./task-manager-frontend/package-lock.json
 
-**/node_modules
+**/node_modules"task-manager-backend/" 
+"task-manager-frontend/" 

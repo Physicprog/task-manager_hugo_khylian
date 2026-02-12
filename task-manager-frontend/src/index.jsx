@@ -3,13 +3,13 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route, } from "react-router-dom";
 import Home from "./Home.jsx";
 import "./index.css";
-import DetailledBoards from "./components/boardsDetailled.jsx";
-import TemplateBoard from "./components/boardTemplate.jsx";
+import BoardDetailled from "./components/boardDetailled.jsx";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-
 function App() {
+
+
   useEffect(() => {
     AOS.init({
       easing: 'ease-in-out',
@@ -29,17 +29,15 @@ function App() {
   }, []);
 
 
-
-
-
   return (
     <>
 
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/detailled-board" element={<DetailledBoards />} />
-          <Route path='/template-board' element={<TemplateBoard />} />
+          <Route path="/board/:boardId" element={<BoardDetailled isTemplate={false} />} />
+          <Route path="/detailled-board" element={<BoardDetailled isTemplate={false} />} /> {/* pour les tests, pas utiliser */}
+          <Route path='/template-board' element={<BoardDetailled isTemplate={true} />} />
         </Routes>
       </Router>
     </>

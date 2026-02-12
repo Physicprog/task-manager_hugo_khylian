@@ -35,16 +35,20 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
     }
 
     function handleSearchChange(e) {
-        const query = e.target.value;
+        const query = e.target.value; //on selectionne la recherche dans la barre de recherche
         if (onSearch) {
-            onSearch(query); //apelle la fonction de recherche avec la recherche en cours
+            onSearch(query);
         }
     }
 
     const handleGoHome = () => {
-        setView("home");
+        if (setView) {
+            setView("home");
+        }
         navigate("/");
     };
+
+    const isConnected = userInfos?.isConnected || false;
 
     return (
         <>
@@ -63,7 +67,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                                     <input type="search" placeholder="Search for a board..." className="w-[250px] px-4 py-2 rounded-lg bg-surface text-sm outline-none text-text" value={searchQuery || ""} onChange={handleSearchChange} />
                                 )}
                                 <button onClick={handleGoHome} className={`px-4 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "home" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>Home</button>
-                                <button onClick={() => setView("projects")} className={`px-4 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
+                                <button onClick={() => setView && setView("projects")} className={`px-4 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
                             </div>
                         </div>
                     )}
@@ -80,7 +84,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                                 <img src={themeIcon} alt="theme" className="w-8 h-8 object-contain" />
                             </button>
 
-                            {!userInfos.isConnected ? (
+                            {!isConnected ? (
                                 <button onClick={onLoginClick} className="px-3 py-2 bg-accent1 text-white border-2 border-text rounded-lg text-sm">Login</button>
                             ) : (<> <span className="text-text text-sm">{userInfos.username}</span>
                                 <img src={userInfos.avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-text" />
@@ -110,8 +114,8 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
 
                     <div className="flex gap-2 w-full">
                         <button onClick={onLoginClick} className="flex-1 px-3 py-2 bg-accent1 text-white border-2 border-text rounded-lg text-sm hover:scale-105 active:scale-95 transition-all duration-200">Login</button>
-                        <button onClick={() => setView("projects")} className={`flex-1 px-3 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
-                        <button onClick={() => setView("home")} className={`flex-1 px-3 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "home" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>Home</button>
+                        <button onClick={() => setView && setView("projects")} className={`flex-1 px-3 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
+                        <button onClick={() => setView && setView("home")} className={`flex-1 px-3 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "home" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>Home</button>
                     </div>
                 </div>
             )}

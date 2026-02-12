@@ -85,17 +85,17 @@ export default function Login({ onClose, onLogin }) {
                 localStorage.setItem("token", result.data.jwt);
             }
 
-            if (onLogin) onLogin(result);
-            if (onClose) onClose();
+            if (onLogin) {
+                await onLogin(result);
+            }
+            if (onClose) {
+                onClose();
+            }
 
         } catch (err) {
             SendNotification("An error occurred during authentication", true, false);
 
-            if (err.code === "ERR_NETWORK") {
-                SendNotification("Server not available or network error, try again later.", true, false);
-            } else if (err && err.response) {
-                SendNotification(err, true, false);
-            } else if (err.message) {
+            if (err.message) {
                 SendNotification(err.message, true, false);
             }
         } finally {
@@ -118,8 +118,6 @@ export default function Login({ onClose, onLogin }) {
                     </button>
                 </div>
 
-
-
                 <h2 className="text-2xl font-bold text-center mb-6">
                     {isRegisterMode ? "Register" : "Login"}
                 </h2>
@@ -127,32 +125,32 @@ export default function Login({ onClose, onLogin }) {
 
                 <form className="flex flex-col gap-4" onSubmit={SwipSubmit}>
                     <input type="text" placeholder="Username" value={formData.username} onChange={e => updateField('username', e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg text-black focus:outline-none focus:border-blue-500" disabled={isLoading} required />
+                        className="w-full p-3 border border-gray-300 rounded-lg text-black" disabled={isLoading} required />
 
                     {isRegisterMode && (
-                        <input type="email" placeholder="Email" value={formData.email} onChange={e => updateField('email', e.target.value)} className="w-full p-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:border-blue-500" disabled={isLoading} required />
+                        <input type="email" placeholder="Email" value={formData.email} onChange={e => updateField('email', e.target.value)} className="w-full p-3 border border-gray-300 text-black rounded-lg" disabled={isLoading} required />
                     )}
 
-                    <input type="password" id="GetPW1" placeholder="Password" value={formData.password} onChange={e => updateField('password', e.target.value)} className="w-full p-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:border-blue-500" disabled={isLoading} required minLength={6} />
+                    <input type="password" id="GetPW1" placeholder="Password" value={formData.password} onChange={e => updateField('password', e.target.value)} className="w-full p-3 border border-gray-300 text-black rounded-lg" disabled={isLoading} required minLength={6} />
 
                     {isRegisterMode && (
-                        <input type="password" id="GetPW2" placeholder="Confirm Password" value={formData.confirmPassword} onChange={e => updateField('confirmPassword', e.target.value)} className="w-full p-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:border-blue-500"
+                        <input type="password" id="GetPW2" placeholder="Confirm Password" value={formData.confirmPassword} onChange={e => updateField('confirmPassword', e.target.value)} className="w-full p-3 border border-gray-300 text-black rounded-lg"
                             disabled={isLoading} required minLength={6} />
                     )}
 
                     {isRegisterMode && (
-                        <select value={formData.gender} onChange={e => updateField('gender', e.target.value)} className="w-full p-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:border-blue-500" disabled={isLoading}>
+                        <select value={formData.gender} onChange={e => updateField('gender', e.target.value)} className="w-full p-3 border border-gray-300 text-black rounded-lg" disabled={isLoading}>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                             <option value="other">Other</option>
                         </select>
                     )}
 
-                    <button type="submit" disabled={isLoading} className="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <button type="submit" disabled={isLoading} className="w-full py-3 bg-accent1 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                         {isLoading ? "Loading..." : isRegisterMode ? "Register" : "Login"}
                     </button>
                     <button type="button" onClick={toggleMode} disabled={isLoading} className="w-full py-2 disabled:opacity-50 transition-colors">
-                        <span className="text-blue-600 hover:text-blue-700 cursor-pointer">
+                        <span className="text-accent1 cursor-pointer">
                             {isRegisterMode ? "Already have an account? Sign in" : "No account? Sign up"}
                         </span>
                     </button>

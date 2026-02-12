@@ -1,0 +1,63 @@
+{
+    "kind": "collectionType",
+    "collectionName": "cards",
+    "info": {
+        "singularName": "card",
+        "pluralName": "cards",
+        "displayName": "Card",
+        "description": "Task cards within board columns"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "title": {
+            "type": "string",
+            "maxLength": 255,
+            "required": true
+        },
+        "description": {
+            "type": "text"
+        },
+        "position": {
+            "type": "integer",
+            "required": true,
+            "default": 0
+        },
+        "dueDate": {
+            "type": "date"
+        },
+        "priority": {
+            "type": "enumeration",
+            "enum": [
+                "low",
+                "normal",
+                "high",
+                "urgent"
+            ],
+            "default": "normal"
+        },
+        "labels": {
+            "type": "json"
+        },
+        "column": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::column.column",
+            "inversedBy": "cards"
+        },
+        "board": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::board.board",
+            "inversedBy": "cards"
+        },
+        "user": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "plugin::users-permissions.user",
+            "inversedBy": "cards"
+        }
+    }
+}

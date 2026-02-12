@@ -1,0 +1,38 @@
+{
+    "kind": "collectionType",
+    "collectionName": "columns",
+    "info": {
+        "singularName": "column",
+        "pluralName": "columns",
+        "displayName": "Column",
+        "description": "Board columns for organizing cards"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string",
+            "maxLength": 255,
+            "required": true
+        },
+        "position": {
+            "type": "integer",
+            "required": true,
+            "default": 0
+        },
+        "board": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::board.board",
+            "inversedBy": "columns"
+        },
+        "cards": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::card.card",
+            "mappedBy": "column"
+        }
+    }
+}

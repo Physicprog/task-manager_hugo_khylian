@@ -79,6 +79,12 @@
       "relation": "oneToMany",
       "target": "api::board.board",
       "mappedBy": "user"
+    },
+    "cards": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::card.card",
+      "mappedBy": "user"
     }
   }
 }

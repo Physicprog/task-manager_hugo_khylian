@@ -1,13 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import DetailledBoards from "./components/boardsDetailled.jsx";
-import TemplateBoard from "./components/boardTemplate.jsx";
+import BoardDetailled from "./components/boardDetailled.jsx";
 
 function Boards() {
     const navigate = useNavigate();
 
     const switchBoardDetailled = () => {
-        navigate("/detailled-board");
+        navigate("/board/example");
     };
 
     const switchBoardTemplate = () => {
@@ -17,11 +16,11 @@ function Boards() {
     return (
         <>
             <div onClick={switchBoardDetailled}>
-                <DetailledBoards />
+                <BoardDetailled />
             </div>
 
             <div onClick={switchBoardTemplate}>
-                <TemplateBoard />
+                <BoardDetailled />
             </div>
         </>
     );

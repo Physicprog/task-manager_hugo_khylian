@@ -154,16 +154,24 @@ export async function CreateNewRawBoard({ title, description, label, endDate }) 
 export async function updateBoard(boardId, data) {
     try {
         const token = localStorage.getItem("token");
+
+        // Utiliser documentId si disponible, sinon utiliser boardId
+        const idToUse = boardId;
+
         const endDateToSend = data.endDate === "" ? null : data.endDate;
 
-        const res = await axios.put(`${API_URL}/api/boards/${boardId}`, {
+        const res = await axios.put(`${API_URL}/api/boards/${idToUse}`, {
             data: { title: data.title, description: data.description, label: data.label, endDate: endDateToSend }
         }, { headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } });
 
         SendNotification("Board updated successfully", true, true);
         return res.data;
     } catch (error) {
-        SendNotification("Error updating board: " + (error.message), true, false);
+        if (error.response?.status === 404) {
+            SendNotification("Board not found. It may have been deleted.", true, false);
+        } else {
+            SendNotification("Error updating board: " + (error.message), true, false);
+        }
         throw error;
     }
 }

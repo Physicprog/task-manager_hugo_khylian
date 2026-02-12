@@ -2,18 +2,23 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 const landscape = '/landscapeMontain.webp';
 
-export default function HomeWelcome({ userInfos, onNewBoardClick }) {
+export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
     const navigate = useNavigate();
 
     function switchBoardDetailled() {
         navigate("/template-board");
     }
+
+    function openProjects() {
+        if (setView) {
+            setView("projects");
+        }
+    }
+
     return (
         <>
             <section id="hero" className="relative h-screen w-full flex justify-center items-center top-[-75px] overflow-hidden">
                 <img src={landscape} alt="Mountain landscape background" className="absolute top-0 left-0 object-cover w-full h-screen filter brightness-[40%] blur-[2px]" />
-
-
                 <div className="relative z-10 max-w-4xl mx-auto px-6 text-center flex flex-col gap-6">
 
                     <h1 data-aos="fade-up" data-aos-delay="200" className="font-museo text-6xl md:text-7xl text-white font-bold mb-2 drop-shadow-2xl">
@@ -25,7 +30,7 @@ export default function HomeWelcome({ userInfos, onNewBoardClick }) {
                     </p>
 
                     <div data-aos="fade-up" data-aos-delay="600" className="flex justify-center mt-4 gap-4">
-                        <a href="#projects" className="px-20 py-4 bg-accent1 hover:bg-accentLight text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">View Workspace</a>
+                        <a href="#projects" className="px-20 py-4 bg-accent1 hover:bg-accentLight text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">How does it work?</a>
                     </div>
                 </div>
 
@@ -139,13 +144,13 @@ export default function HomeWelcome({ userInfos, onNewBoardClick }) {
                 </div>
             </main>
 
-            <main className="py-20 px-6 bg-cardBg/30">
+            <main id="HowItWorks" className="py-20 px-6 bg-cardBg/30">
                 <div className="max-w-5xl mx-auto">
                     <h2 data-aos="fade-up" className="text-4xl md:text-5xl font-bold text-center text-text mb-4">
                         How It Works
                     </h2>
                     <p data-aos="fade-up" data-aos-delay="200" className="text-center text-gray-400 text-lg mb-16 max-w-2xl mx-auto">
-                        Get started in secondes. Here's how to make the most of Task Manager.
+                        Get started in seconds. Here's how to make the most of Task Manager.
                     </p>
 
                     <div className="space-y-12">
@@ -186,7 +191,7 @@ export default function HomeWelcome({ userInfos, onNewBoardClick }) {
                             <div className="flex-1">
                                 <h3 className="text-2xl font-semibold text-text mb-3"><strong>D</strong>rag, <strong>D</strong>rop, <strong>D</strong>one</h3>
                                 <p className="text-gray-400 text-lg">
-                                    Move cards between lists as work progresses. Everything updates automaticly.
+                                    Move cards between lists as work progresses. Everything updates automatically.
                                 </p>
                             </div>
                         </div>
@@ -194,7 +199,7 @@ export default function HomeWelcome({ userInfos, onNewBoardClick }) {
                 </div>
             </main>
 
-            <section className="py-20 px-6 bg-background">
+            <section id="WhyUs" className="py-20 px-6 bg-background">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 data-aos="fade-up" className="text-4xl md:text-5xl font-bold text-text mb-4">
@@ -298,19 +303,37 @@ export default function HomeWelcome({ userInfos, onNewBoardClick }) {
             </section>
 
 
-            <footer className="py-20 px-6 bg-gradient-to-br from-accent1/10 to-accentLight/10" >
-                <div className="max-w-4xl mx-auto text-center">
-                    <h2 data-aos="zoom-in" className="text-4xl md:text-5xl  font-bold text-text mb-6">
-                        Want to give it a <strong>try</strong> ?
-                    </h2>
-                    <p data-aos="zoom-in" data-aos-delay="200" className="text-gray-300 text-xl mb-8 max-w-2xl mx-auto">
-                        Start managing your tasks better. Don't need an account to get started!
-                    </p>
-                    <a data-aos="zoom-in" data-aos-delay="400" onClick={() => switchBoardDetailled()} className="inline-block px-12 py-4 bg-accent1 hover:bg-accentLight text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">
-                        Try a template board now
-                    </a>
-                </div>
-            </footer>
+            {!userInfos || !userInfos.isConnected ? (
+                <section className="py-20 px-6 bg-gradient-to-br from-accent1/10 to-accentLight/10" >
+                    <div className="max-w-4xl mx-auto text-center">
+                        <h2 data-aos="zoom-in" className="text-4xl md:text-5xl  font-bold text-text mb-6">
+                            Want to give it a <strong>try</strong> ?
+                        </h2>
+                        <p data-aos="zoom-in" data-aos-delay="200" className="text-gray-300 text-xl mb-8 max-w-2xl mx-auto">
+                            Start managing your tasks better. Don't need an account to get started!
+                        </p>
+                        <a data-aos="zoom-in" data-aos-delay="400" onClick={switchBoardDetailled} className="inline-block px-12 py-4 bg-accent1 hover:bg-accentLight text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">
+                            Try a template board now
+                        </a>
+                    </div>
+                </section>
+            ) : (
+                <section className="py-20 px-6 bg-gradient-to-br from-accent1/10 to-accentLight/10" >
+                    <div className="max-w-4xl mx-auto text-center">
+                        <h2 data-aos="zoom-in" className="text-4xl md:text-5xl  font-bold text-text mb-6">
+                            You have new project idea ?
+                        </h2>
+                        <p data-aos="zoom-in" data-aos-delay="200" className="text-gray-300 text-xl mb-8 max-w-2xl mx-auto">
+                            Go now create a new projects!
+                        </p>
+                        <div className="flex justify-center gap-4" data-aos="zoom-in" data-aos-delay="400">
+                            <a onClick={openProjects} className="inline-block px-12 py-4 bg-accent1 hover:bg-accentLight text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">
+                                View my projects
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            )}
 
         </>
     );

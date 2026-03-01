@@ -45,6 +45,7 @@ export default function Footer({ WantToAddLink = true, currentView, setView }) {
                             <h3 className="text-xl text-text mb-4">
                                 Contact
                             </h3>
+
                             <div className="flex flex-col gap-4">
                                 <a href="tel:0895234069" className="flex flex-row items-center gap-2 text-text hover:text-accent1 transition-colors duration-300 whitespace-nowrap">
                                     <span className="material-symbols-outlined">
@@ -59,6 +60,7 @@ export default function Footer({ WantToAddLink = true, currentView, setView }) {
                                     </span>
                                     support@taskmanager.com
                                 </a>
+
                             </div>
                         </div>
 

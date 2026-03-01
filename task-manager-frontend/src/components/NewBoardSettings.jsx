@@ -76,9 +76,9 @@ export default function NewBoardSettings({ onClose, onOpen, onBoardNotFound, edi
     }
 
     return (
-        <div className={`fixed inset-0 flex items-center justify-center z-[9999] ${closing ? "animate-scaleOUT" : "animate-scaleIN"}`}>
+        <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] ${closing ? "animate-scaleOUT" : "animate-scaleIN"}`} onClick={SwipClose}>
 
-            <div className="bg-grayLight p-4 rounded-lg w-[420px] max-w-[90%] relative border-2 border-accent1 shadow-lg">
+            <div className="bg-grayLight p-4 rounded-lg w-[420px] max-w-[90%] relative border-2 border-accent1 shadow-lg" onClick={(e) => e.stopPropagation()}>
                 <button onClick={SwipClose} className="absolute top-3 right-3 text-white hover:opacity-70 transition disabled:opacity-50" disabled={isLoading}>
                     <img src={Close} alt="Close" className="w-6 h-6" />
                 </button>

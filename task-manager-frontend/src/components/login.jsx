@@ -105,8 +105,8 @@ export default function Login({ onClose, onLogin }) {
 
 
     return (
-        <div className={`fixed inset-0 z-[9000] flex items-center justify-center ${closing ? "animate-scaleOUT" : "animate-scaleIN"}`}>
-            <div className="relative w-[450px]   backdrop-blur-sm  max-w-[90%] bg-secondary  text-gray-900 dark:text-text rounded-xl border border-gray-200 dark:border-gray-700 p-10 shadow-xl">
+        <div className={`fixed inset-0 bg-black bg-opacity-50 z-[9000] flex items-center justify-center ${closing ? "animate-scaleOUT" : "animate-scaleIN"}`} onClick={SwipClose}>
+            <div className="relative w-[450px]   backdrop-blur-sm  max-w-[90%] bg-secondary  text-gray-900 dark:text-text rounded-xl border border-gray-200 dark:border-gray-700 p-10 shadow-xl" onClick={(e) => e.stopPropagation()}>
 
                 <div>
                     <button onClick={SwipClose} className={`absolute top-4 right-4 hover:opacity-70 transition`}>

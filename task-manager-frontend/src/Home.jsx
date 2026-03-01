@@ -182,6 +182,8 @@ export default function Home() {
     setShowNewBoard(false);
   }
 
+  // Suppression de compte désactivée
+
   return (
     <>
       <div className="min-h-screen bg-surface">

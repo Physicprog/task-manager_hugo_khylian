@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { SendNotification } from "../../utils/notifs.js";
+import { SendNotification } from "../../../utils/notifs.js";
 const Close = "/Close.png";
 
-export default function CardDetailPopup({ card, column, onClose, onUpdate, onDelete }) {
+export default function CardCreatePopup({ column, onClose, onCreate }) {
     const [formData, setFormData] = useState({
-        title: card?.title || '',
-        description: card?.description || '',
-        priority: card?.priority || 'normal',
-        dueDate: card?.dueDate || '',
-        label: card?.labels?.[0] || '',
-        favorite: card?.favorite || false
+        title: '',
+        description: '',
+        priority: 'normal',
+        dueDate: '',
+        label: '',
+        favorite: false
     });
     const [isLoading, setIsLoading] = useState(false);
     const [closing, setClosing] = useState(false);
@@ -24,21 +24,13 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
         Pink: '#ff4db6'
     };
 
-    const priorityColors = {
-        low: 'border-green-500',
-        normal: 'border-blue-500',
-        high: 'border-yellow-500',
-        urgent: 'border-red-500'
-    };
-
     function SwipClose() {
+        if (isLoading) return;
         setClosing(true);
         setTimeout(onClose, 300);
     }
 
-    if (!card) return null;
-
-    async function handleUpdate() {
+    async function handleCreate() {
         if (!formData.title.trim()) {
             SendNotification("Title is required", true, false);
             return;
@@ -46,7 +38,7 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
 
         setIsLoading(true);
         try {
-            await onUpdate(card.id, {
+            await onCreate(column.id, {
                 title: formData.title,
                 description: formData.description,
                 priority: formData.priority,
@@ -54,10 +46,11 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                 labels: formData.label ? [formData.label] : null,
                 favorite: formData.favorite
             });
+            SendNotification("Card created successfully", true, true);
             SwipClose();
         } catch (error) {
-            console.error('Error updating card:', error);
-            SendNotification("Error updating card", true, false);
+            console.error('Error creating card:', error);
+            SendNotification("Error creating card", true, false);
         } finally {
             setIsLoading(false);
         }
@@ -68,31 +61,16 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                         checked={formData.favorite}
                         onChange={e => setFormData({ ...formData, favorite: e.target.checked })}
                         disabled={isLoading}
-                        id="favorite-checkbox-detail"
+                        id="favorite-checkbox"
                     />
-                    <label htmlFor="favorite-checkbox-detail" className="text-text text-sm">Favorite</label>
+                    <label htmlFor="favorite-checkbox" className="text-text text-sm">Favorite</label>
                 </div>
 
-    async function handleDelete() {
-        if (!window.confirm("Are you sure you want to delete this card?")) return;
-
-        setIsLoading(true);
-        try {
-            await onDelete(card.id);
-            SwipClose();
-        } catch (error) {
-            console.error('Error deleting card:', error);
-            SendNotification("Error deleting card", true, false);
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
     return (
-        <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${closing ? "animate-scaleOUT" : "animate-scaleIN"}`} onClick={SwipClose}>
+        <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] ${closing ? "animate-scaleOUT" : "animate-scaleIN"}`} onClick={SwipClose}>
             <div className="bg-secondary p-6 rounded-lg w-[500px] max-w-[90%] border-2 border-accent1 shadow-lg" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-text text-xl font-museo">Card Details</h2>
+                    <h2 className="text-text text-xl font-museo">Create New Card</h2>
                     <button onClick={SwipClose} className="hover:opacity-70 transition" disabled={isLoading}>
                         <img src={Close} alt="Close" className="w-6 h-6" />
                     </button>
@@ -101,11 +79,9 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                 <div className="h-[2px] w-full bg-accent1 rounded mb-4"></div>
 
                 <div className="flex flex-col gap-3">
-                    {column && (
-                        <div className="text-sm text-gray-400">
-                            In column: <span className="text-text font-medium">{column.title}</span>
-                        </div>
-                    )}
+                    <div className="text-sm text-gray-400">
+                        In column: <span className="text-text font-medium">{column.title}</span>
+                    </div>
 
                     <div>
                         <label className="block text-text text-sm mb-1">Title *</label>
@@ -115,7 +91,8 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1"
                             disabled={isLoading}
-                            placeholder="Card title"
+                            placeholder="Enter card title"
+                            autoFocus
                         />
                     </div>
 
@@ -126,7 +103,7 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1 resize-none"
                             disabled={isLoading}
-                            placeholder="Card description"
+                            placeholder="Enter card description"
                             rows={4}
                         />
                     </div>
@@ -186,22 +163,13 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                         </div>
                     )}
 
-                    <div className="flex gap-2 mt-4">
-                        <button
-                            onClick={handleUpdate}
-                            disabled={isLoading}
-                            className="flex-1 px-4 py-2 bg-accent1 text-white rounded hover:opacity-90 disabled:opacity-50"
-                        >
-                            {isLoading ? "Updating..." : "Update"}
-                        </button>
-                        <button
-                            onClick={handleDelete}
-                            disabled={isLoading}
-                            className="px-4 py-2 bg-red-500 text-white rounded hover:opacity-90 disabled:opacity-50"
-                        >
-                            Delete
-                        </button>
-                    </div>
+                    <button
+                        onClick={handleCreate}
+                        disabled={isLoading}
+                        className="w-full px-4 py-2 bg-accent1 text-white rounded hover:opacity-90 disabled:opacity-50 mt-2"
+                    >
+                        {isLoading ? "Creating..." : "Create Card"}
+                    </button>
                 </div>
             </div>
         </div>

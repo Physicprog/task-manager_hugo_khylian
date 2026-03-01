@@ -31,7 +31,11 @@
 
 <body class="theme-light text-text transition-colors duration-300 ease-in-out">
 
-  <div id="root"></div>
+    <div id="root"></div>
+  <script type="text/javascript">
+
+  </script>
+
 
   <div id="loader">
     <div class="spinner"></div>
@@ -53,20 +57,32 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
 
-  <!-- timeout sur les scripts pour moins de lag au debut-->
+  <!--on charge le react plus tard pour que le style arrive avant afin éviter des lags au début-->
   <script type="text/javascript">
-    setTimeout(() => {
-      var element = document.createElement("script");
-      element.src = "/loader.js";
-      document.body.appendChild(element);
-    }, 0);
+    function loadJSAtOnload() {
 
-    setTimeout(() => {
-      var element = document.createElement("script");
-      element.src = "/src/index.jsx";
+  setTimeout(() => {
+      var element = document.createElement("div");
+      element.id = "root";
       element.type = "module";
       document.body.appendChild(element);
-    }, 200);
+    }, 50);
+
+      setTimeout(() => {
+        var element = document.createElement("script");
+        element.src = "/src/index.jsx";
+        element.type = "module";  
+        document.body.appendChild(element);
+      }, 200);
+    }
+
+    if (window.addEventListener) {
+      window.addEventListener("load", loadJSAtOnload, false);
+    } else if (window.attachEvent) {
+      window.attachEvent("onload", loadJSAtOnload);
+    } else {
+      window.onload = loadJSAtOnload;
+    }
   </script>
 
 </body>

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter as Router, Routes, Route, } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./Home.jsx";
 import "./index.css";
 import BoardDetailled from "./components/boardDetailled.jsx";
@@ -10,6 +10,7 @@ import 'aos/dist/aos.css';
 function App() {
 
 
+    //on intialise AOS pour les animations et le loader par la suite
   useEffect(() => {
     AOS.init({
       easing: 'ease-in-out',
@@ -26,7 +27,7 @@ function App() {
         }, 1500);
       }, 500);
     }
-  }, []);
+  }, []); //le [] permet d'executer une seule fois le useEffect 
 
 
   return (
@@ -36,7 +37,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/board/:boardId" element={<BoardDetailled isTemplate={false} />} />
-          <Route path="/detailled-board" element={<BoardDetailled isTemplate={false} />} /> {/* pour les tests, pas utiliser */}
           <Route path='/template-board' element={<BoardDetailled isTemplate={true} />} />
         </Routes>
       </Router>

@@ -138,3 +138,11 @@ strong {
     font-weight: 600;
     text-decoration: underline 2px var(--color-accent-main);
 }
+
+.hide-scrollbar {
+    scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}

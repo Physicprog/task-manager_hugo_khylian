@@ -58,6 +58,7 @@ export async function getColumnsByBoard(boardId) {
 
         const allColumns = response.data.data;
 
+ 
         const filteredColumns = allColumns.filter(col => {
             const colBoardId = col.board?.documentId;
             return colBoardId === boardId;

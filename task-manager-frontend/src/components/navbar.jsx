@@ -96,20 +96,13 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                                 <>
                                     <span className="text-text text-sm">{userInfos.username}</span>
                                     <button onClick={ToogleShowMenu} className="w-10 h-10 rounded-full overflow-hidden border-2 border-text p-[2px]">
-                                        <img src={userInfos.avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-text" />
+                                        <img src={userInfos.avatar} alt="avatar" className="select-none w-10 h-10 rounded-full object-cover border-2 border-text" />
                                     </button>
                                     <button onClick={onLogout} className="px-3 py-2 bg-red-500 text-white border-2 border-text rounded-lg text-sm">Logout</button>
                                 </>
                             )}
                         </div>
                     )}
-
-                    {AvatarMenuOpen && (
-                        <div className="absolute top-[60px] right-3 bg-secondary border border-white/20 rounded-lg p-3 flex flex-col gap-3 z-[9999]">
-                            <button onClick={() => setView && setView("projects")} className={`px-4 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
-                        </div>
-                    )}
-
 
 
                     {isMobile && (
@@ -137,7 +130,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                         {isConnected && (
                             <>
                                 <span className="text-text text-sm whitespace-nowrap">{userInfos.username}</span>
-                                <img src={userInfos.avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-text shrink-0" />
+                                <img src={userInfos.avatar} alt="avatar" className="select-none w-10 h-10 rounded-full object-cover border-2 border-text shrink-0" />
                             </>
                         )}
                     </div>
@@ -164,7 +157,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                         {isConnected && (
                             <>
                                 <span className="text-text text-sm whitespace-nowrap ml-auto">{userInfos.username}</span>
-                                <img src={userInfos.avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-text shrink-0" />
+                                <img src={userInfos.avatar} alt="avatar" className="select-none w-10 h-10 rounded-full object-cover border-2 border-text shrink-0" />
                             </>
                         )}
                     </div>

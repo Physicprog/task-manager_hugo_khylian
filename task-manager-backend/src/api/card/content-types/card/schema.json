@@ -41,6 +41,10 @@
         "labels": {
             "type": "json"
         },
+        "favorite": {
+            "type": "boolean",
+            "default": false
+        },
         "column": {
             "type": "relation",
             "relation": "manyToOne",

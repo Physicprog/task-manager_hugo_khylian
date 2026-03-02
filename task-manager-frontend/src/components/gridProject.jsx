@@ -16,6 +16,46 @@ export const labelClasses = {
     pink: "bg-label-pink",
 };
 
+function checkIfMobile() {
+    return window.innerWidth < 850;
+}
+
+function setupMobileDetection(setIsMobile) {
+    function handleResize() {
+        setIsMobile(checkIfMobile());
+    }
+    
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    
+    return function() {
+        window.removeEventListener("resize", handleResize);
+    };
+}
+
+function closeMenusAndPopups(setOpenMenuId, setShowModifyPopup, setSelectedItem) {
+    setOpenMenuId(null);
+    setShowModifyPopup(false);
+    setSelectedItem(null);
+}
+
+function setupClickOutsideListener(openMenuId, setOpenMenuId) {
+    function handleClickOutside(event) {
+        if (openMenuId !== null) {
+            const menuContainer = event.target.closest('.menu-container');
+            if (!menuContainer) {
+                setOpenMenuId(null);
+            }
+        }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+    
+    return function() {
+        document.removeEventListener('click', handleClickOutside);
+    };
+}
+
 export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoardModificationError, closeMenuTrigger }) {
     const [isMobile, setIsMobile] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
@@ -25,58 +65,52 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 850);
-        handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+    useEffect(function() {
+        return setupMobileDetection(setIsMobile);
     }, []);
 
-    useEffect(() => {
+    useEffect(function() {
         if (closeMenuTrigger > 0) {
-            setOpenMenuId(null);
-            setShowModifyPopup(false);
-            setSelectedItem(null);
+            closeMenusAndPopups(setOpenMenuId, setShowModifyPopup, setSelectedItem);
         }
     }, [closeMenuTrigger]);
 
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (openMenuId !== null) {
-                const menuContainer = event.target.closest('.menu-container');
-                if (!menuContainer) {
-                    setOpenMenuId(null);
-                }
-            }
-        }
-
-        document.addEventListener('click', handleClickOutside);
-        return () => document.removeEventListener('click', handleClickOutside);
+    useEffect(function() {
+        return setupClickOutsideListener(openMenuId, setOpenMenuId);
     }, [openMenuId]);
 
 
-    function switchBoardDetailled(item) {
-        if (!isDeleting && !openMenuId) {
-            const boardId = item.documentId || item.id;
+    function shouldNavigateToBoard() {
+        return !isDeleting && !openMenuId;
+    }
+
+    function getBoardId(item) {
+        return item.documentId || item.id;
+    }
+
+    function navigateToBoard(item) {
+        if (shouldNavigateToBoard()) {
+            const boardId = getBoardId(item);
             navigate(`/board/${boardId}`);
         }
     }
 
-
-
-
-    async function handleDelete(item) {
-        const boardId = item.documentId || item.id;
+    async function deleteBoardById(boardId) {
         try {
             await deleteBoard(boardId);
             SendNotification("Board deleted successfully", true, true);
+            
             if (onDelete) {
                 await onDelete();
-
             }
         } catch (err) {
             SendNotification(`Error deleting board: ${err}`, true, false);
         }
+    }
+
+    function handleDelete(item) {
+        const boardId = getBoardId(item);
+        deleteBoardById(boardId);
     }
 
     function openModifyPopup(item) {
@@ -89,21 +123,61 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
         setSelectedItem(null);
     }
 
-    async function handleModifyComplete() {
-        setShowModifyPopup(false);
-        setSelectedItem(null);
+    async function reloadBoardsAfterModification() {
         if (onDelete) {
             await onDelete();
         }
+    }
+
+    async function handleModifyComplete() {
+        setShowModifyPopup(false);
+        setSelectedItem(null);
+        await reloadBoardsAfterModification();
     }
 
     function handleBoardNotFoundError() {
         SendNotification("Board not found", true, false);
         setShowModifyPopup(false);
         setSelectedItem(null);
+        
         if (onBoardModificationError) {
             onBoardModificationError();
         }
+    }
+
+    function getCardWidth(isMobile) {
+        return isMobile ? "100%" : "calc(20% - 1rem)";
+    }
+
+    function isMenuOpenForItem(item) {
+        return openMenuId === item.id;
+    }
+
+    function canClickCard(item) {
+        const isMenuOpen = isMenuOpenForItem(item);
+        return !isMenuOpen && !isDeleting;
+    }
+
+    function handleCardClick(item) {
+        if (canClickCard(item)) {
+            navigateToBoard(item);
+        }
+    }
+
+    function handleMenuClick(e, item) {
+        e.stopPropagation();
+        setOpenMenuId(openMenuId === item.id ? null : item.id);
+    }
+
+    function handleModifyClick(e, item) {
+        e.stopPropagation();
+        openModifyPopup(item);
+    }
+
+    function handleDeleteClick(e, item) {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        handleDelete(item);
     }
 
 
@@ -119,27 +193,24 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
                         No boards yet. Create your first board!
                     </div>
                 ) : (
-                    items.map((item) => { //boucle pour chaque baord
+                    items.map(function(item) {
                         const label = item.label?.toLowerCase();
-                        const isMenuOpen = openMenuId === item.id;
-
+                        const isMenuOpen = isMenuOpenForItem(item);
                         const cardClasses = `relative cursor-pointer h-44 rounded-lg overflow-hidden shadow-buttonLight hover:shadow-buttonDark transition bg-white dark:bg-gray-800`;
 
                         return (
-                            <div key={item.id} className={cardClasses} style={{ width: isMobile ? "100%" : "calc(20% - 1rem)" }} onClick={() => !isMenuOpen && !isDeleting && switchBoardDetailled(item)} >
+                            <div key={item.id} className={cardClasses} style={{ width: getCardWidth(isMobile) }} onClick={function() { handleCardClick(item); }}>
                                 <div className="absolute inset-0 bg-secondary" />
 
                                 <div className="relative z-10 h-full flex flex-col justify-between p-3">
                                     <div className="flex justify-between items-start">
                                         <div className="flex-1">
                                             <span style={{ boxShadow: `0px 5px 20px rgba(var(--label-${label}), 0.5)` }} className={`block h-[0.8vh] w-full mb-1 rounded-md ${labelClasses[label] || labelClasses.red}`} />
-                                            <h3 className="font-museo text-base text-text break-words">
-                                                {item.title}
-                                            </h3>
+                                            <h3 className="font-museo text-base text-text break-words">{item.title}</h3>
                                         </div>
 
                                         <div className="relative menu-container ml-2">
-                                            <img src={Dots} alt="more options" className="w-5 h-5 cursor-pointer hover:opacity-70 transition" onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }} />
+                                            <img src={Dots} alt="more options" className="w-5 h-5 cursor-pointer hover:opacity-70 transition" onClick={function(e) { handleMenuClick(e, item); }} />
 
 
 
@@ -149,11 +220,11 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
                                             {isMenuOpen && (
                                                 <div className="absolute right-0 mt-2 bg-secondary border-2 border-accent1 rounded shadow-xl w-36 z-50 overflow-hidden">
                                                     <div className="h-[1px] bg-accent1/30" />
-                                                    <button className="w-full text-left px-4 py-2.5 text-text hover:bg-accent1 hover:text-white transition font-medium" onClick={(e) => { e.stopPropagation(); openModifyPopup(item); }} >
+                                                    <button className="w-full text-left px-4 py-2.5 text-text hover:bg-accent1 hover:text-white transition font-medium" onClick={function(e) { handleModifyClick(e, item); }}>
                                                         Modify
                                                     </button>
                                                     <div className="h-[1px] bg-accent1/30" />
-                                                    <button className="w-full text-left px-4 py-2.5 text-red-500 hover:bg-red-500 hover:text-white transition font-medium disabled:opacity-50" onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); handleDelete(item); }}>
+                                                    <button className="w-full text-left px-4 py-2.5 text-red-500 hover:bg-red-500 hover:text-white transition font-medium disabled:opacity-50" onClick={function(e) { handleDeleteClick(e, item); }}>
                                                         {isDeleting ? "Deleting..." : "Delete"}
                                                     </button>
                                                 </div>

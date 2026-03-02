@@ -139,10 +139,9 @@ strong {
     text-decoration: underline 2px var(--color-accent-main);
 }
 
+
 .hide-scrollbar {
-    scrollbar-width: none;
+    scrollbar-color: var(--color-accent-main) transparent;
+    scrollbar-width: thin; 
 }
 
-.hide-scrollbar::-webkit-scrollbar {
-    display: none;
-}

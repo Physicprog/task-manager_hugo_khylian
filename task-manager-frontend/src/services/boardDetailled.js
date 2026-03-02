@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:1337";
+import  { API_URL }  from "./authService.js";
 
 export async function getBoardDetails(boardId, paramToReturn) {
     try {
@@ -40,7 +39,17 @@ export async function getBoardDetails(boardId, paramToReturn) {
         return board;
     } catch (error) {
         console.error("Error fetching board details:", error);
-        return null;
+        
+        if (error.response) {
+            if (error.response.status === 404) {
+                return "Board not found";
+            }
+            if (error.response.status === 401 || error.response.status === 403) {
+                return null;
+            }
+        }
+        
+        return "Server error";
     }
 }
 

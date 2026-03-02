@@ -1,18 +1,23 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 const landscape = '/landscapeMontain.webp';
 
 export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
     const navigate = useNavigate();
 
-    function switchBoardDetailled() {
+    function goToTemplateBoard() {
         navigate("/template-board");
     }
 
-    function openProjects() {
+    function goToProjects() {
         if (setView) {
             setView("projects");
         }
+    }
+
+    function checkIfUserConnected() {
+        return userInfos && userInfos.isConnected;
     }
 
     return (
@@ -303,7 +308,7 @@ export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
             </section>
 
 
-            {!userInfos || !userInfos.isConnected ? (
+            {!checkIfUserConnected() ? (
                 <section className="py-20 px-6 bg-gradient-to-br from-accent1/10 to-accentLight/10" >
                     <div className="max-w-4xl mx-auto text-center">
                         <h2 data-aos="zoom-in" className="text-4xl md:text-5xl  font-bold text-text mb-6">
@@ -312,7 +317,7 @@ export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
                         <p data-aos="zoom-in" data-aos-delay="200" className="text-gray-300 text-xl mb-8 max-w-2xl mx-auto">
                             Start managing your tasks better. Don't need an account to get started!
                         </p>
-                        <a data-aos="zoom-in" data-aos-delay="400" onClick={switchBoardDetailled} className="inline-block px-12 py-4 bg-accent1 hover:bg-accentLight text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">
+                        <a data-aos="zoom-in" data-aos-delay="400" onClick={goToTemplateBoard} className="inline-block px-12 py-4 bg-accent1 hover:bg-accentLight text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">
                             Try a template board now
                         </a>
                     </div>
@@ -327,7 +332,7 @@ export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
                             Go now create a new projects!
                         </p>
                         <div className="flex justify-center gap-4" data-aos="zoom-in" data-aos-delay="400">
-                            <a onClick={openProjects} className="inline-block px-12 py-4 bg-accent1 hover:bg-accentLight text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">
+                            <a onClick={goToProjects} className="inline-block px-12 py-4 bg-accent1 hover:bg-accentLight text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer transform">
                                 View my projects
                             </a>
                         </div>

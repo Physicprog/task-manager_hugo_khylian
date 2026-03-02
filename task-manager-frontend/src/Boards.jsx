@@ -5,21 +5,21 @@ import BoardDetailled from "./components/boardDetailled.jsx";
 function Boards() {
     const navigate = useNavigate();
 
-    const switchBoardDetailled = () => {
+    function goToBoardExample() {
         navigate("/board/example");
-    };
+    }
 
-    const switchBoardTemplate = () => {
+    function goToTemplateBoard() {
         navigate("/template-board");
-    };
+    }
 
     return (
         <>
-            <div onClick={switchBoardDetailled}>
+            <div onClick={goToBoardExample}>
                 <BoardDetailled />
             </div>
 
-            <div onClick={switchBoardTemplate}>
+            <div onClick={goToTemplateBoard}>
                 <BoardDetailled />
             </div>
         </>

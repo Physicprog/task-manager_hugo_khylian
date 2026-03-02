@@ -1,33 +1,21 @@
 import axios from "axios";
+import { SendNotification } from "../utils/notifs";
+import  { API_URL } from "./authService.js";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:1337";
 
 export async function createColumn(boardId, title) {
     try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("User not authenticated");
 
-        const response = await axios.post(
-            `${API_URL}/api/columns`,
-            {
-                data: {
-                    name: title,
-                    board: boardId,
-                    position: 0
-                }
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            }
+        const response = await axios.post(`${API_URL}/api/columns`,
+            { data: { name: title, board: boardId, position: 0} },
+            {headers: {"Authorization": `Bearer ${token}`}}
         );
 
         return response.data?.data;
     } catch (error) {
-        console.error("Error creating column:", error.response?.data || error);
-        throw error;
+        SendNotification("Error creating column:", true, false);
     }
 }
 
@@ -36,26 +24,14 @@ export async function updateColumn(columnId, data) {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("User not authenticated");
 
-        // Strapi v5: use documentId directly in URL
-        const response = await axios.put(
-            `${API_URL}/api/columns/${columnId}`,
-            {
-                data: {
-                    name: data.title
-                }
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            }
+        const response = await axios.put(`${API_URL}/api/columns/${columnId}`,
+            {data: {name: data.title}
+            },{headers: {"Authorization": `Bearer ${token}`}}
         );
 
         return response.data?.data;
     } catch (error) {
-        console.error("Error updating column:", error);
-        throw error;
+        SendNotification("Error updating column:", true, false);
     }
 }
 
@@ -64,7 +40,7 @@ export async function deleteColumn(columnId) {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("User not authenticated");
 
-        // Strapi v5: use documentId directly in URL
+        // Strapi v5: use documentId with document endpoint
         const response = await axios.delete(
             `${API_URL}/api/columns/${columnId}`,
             {
@@ -85,7 +61,9 @@ export async function deleteColumn(columnId) {
 export async function getColumnsByBoard(boardId) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
+        if (!token) {
+            return null;
+        }
 
         // Get columns with board only
         const url = `${API_URL}/api/columns?populate[0]=board&sort=position:asc`;
@@ -138,6 +116,16 @@ export async function getColumnsByBoard(boardId) {
         return columnsWithCards;
     } catch (error) {
         console.error("Error fetching columns:", error);
-        throw error;
+        
+        if (error.response) {
+            if (error.response.status === 404) {
+                return "Board not found";
+            }
+            if (error.response.status === 401 || error.response.status === 403) {
+                return null;
+            }
+        }
+        
+        return "Server error";
     }
 }

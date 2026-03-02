@@ -1,22 +1,27 @@
 import React from 'react';
 
+function scrollToElement(sectionId) {
+    const element = document.getElementById(sectionId);
+    if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+    }
+}
+
+function scrollToElementWithDelay(sectionId) {
+    setTimeout(function() {
+        scrollToElement(sectionId);
+    }, 100);
+}
+
 export default function Footer({ WantToAddLink = true, currentView, setView }) {
     function handleSectionClick(e, sectionId) {
         e.preventDefault();
 
         if (currentView !== "home" && setView) {
             setView("home");
-            setTimeout(() => {
-                const element = document.getElementById(sectionId);
-                if (element) {
-                    element.scrollIntoView({ behavior: "smooth" });
-                }
-            }, 100);
+            scrollToElementWithDelay(sectionId);
         } else {
-            const element = document.getElementById(sectionId);
-            if (element) {
-                element.scrollIntoView({ behavior: "smooth" });
-            }
+            scrollToElement(sectionId);
         }
     }
 
@@ -71,11 +76,10 @@ export default function Footer({ WantToAddLink = true, currentView, setView }) {
                                         <a href="#" onClick={handleBackToTop} className='hover:text-accent1'>
                                             Back to top
                                         </a>
-                                        <a href="#HowItWorks" onClick={(e) => handleSectionClick(e, "HowItWorks")} className='hover:text-accent1'>
+                                        <a href="#HowItWorks" onClick={function(e) { handleSectionClick(e, "HowItWorks"); }} className='hover:text-accent1'>
                                             How it works
                                         </a>
-
-                                        <a href="#WhyUs" onClick={(e) => handleSectionClick(e, "WhyUs")} className='hover:text-accent1'>
+                                        <a href="#WhyUs" onClick={function(e) { handleSectionClick(e, "WhyUs"); }} className='hover:text-accent1'>
                                             Why us ?
                                         </a>
                                     </div>

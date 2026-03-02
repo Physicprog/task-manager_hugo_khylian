@@ -79,10 +79,6 @@ export default function CardCreatePopup({ column, onClose, onCreate }) {
                 <div className="h-[2px] w-full bg-accent1 rounded mb-4"></div>
 
                 <div className="flex flex-col gap-3">
-                    <div className="text-sm text-gray-400">
-                        In column: <span className="text-text font-medium">{column.title}</span>
-                    </div>
-
                     <div>
                         <label className="block text-text text-sm mb-1">Title *</label>
                         <input
@@ -150,18 +146,6 @@ export default function CardCreatePopup({ column, onClose, onCreate }) {
                             disabled={isLoading}
                         />
                     </div>
-
-                    {formData.label && (
-                        <div className="flex items-center gap-2 text-sm">
-                            <span className="text-gray-400">Label preview:</span>
-                            <div
-                                className="px-3 py-1 rounded text-white font-medium"
-                                style={{ backgroundColor: labelColors[formData.label] }}
-                            >
-                                {formData.label}
-                            </div>
-                        </div>
-                    )}
 
                     <button
                         onClick={handleCreate}

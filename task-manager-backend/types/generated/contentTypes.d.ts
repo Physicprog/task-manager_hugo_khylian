@@ -530,6 +530,7 @@ export interface ApiCardCard extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
     dueDate: Schema.Attribute.Date;
+    favorite: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     labels: Schema.Attribute.JSON;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::card.card'> &

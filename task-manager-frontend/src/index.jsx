@@ -4,44 +4,51 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Home from "./Home.jsx";
 import "./index.css";
 import BoardDetailled from "./components/boardDetailled.jsx";
+import ErrorPage from "./ErrorPage.jsx";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-function App() {
-
-
-    //on intialise AOS pour les animations et le loader par la suite
-  useEffect(() => {
+function initializeAnimations() {
     AOS.init({
-      easing: 'ease-in-out',
-      once: true,
+        easing: 'ease-in-out',
+        once: true,
     });
+}
 
+function hideLoader() {
     const loader = document.getElementById("loader");
-    if (loader) {
-      setTimeout(() => {
+    if (!loader) {
+        return;
+    }
+
+    setTimeout(function() {
         loader.style.opacity = "0";
         loader.style.transition = "opacity 1.5s ease";
-        setTimeout(() => {
-          loader.style.display = "none";
+        
+        setTimeout(function() {
+            loader.style.display = "none";
         }, 1500);
-      }, 500);
-    }
-  }, []); //le [] permet d'executer une seule fois le useEffect 
+    }, 500);
+}
 
+function App() {
+    useEffect(function() {
+        initializeAnimations();
+        hideLoader();
+    }, []); //ne charge qu'une fois 
 
-  return (
-    <>
-
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/board/:boardId" element={<BoardDetailled isTemplate={false} />} />
-          <Route path='/template-board' element={<BoardDetailled isTemplate={true} />} />
-        </Routes>
-      </Router>
-    </>
-  );
+    return (
+        <>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/board/:boardId" element={<BoardDetailled isTemplate={false} />} />
+                    <Route path='/template-board' element={<BoardDetailled isTemplate={true} />} />
+                    <Route path="/error/:errorType" element={<ErrorPage />} />
+                </Routes>
+            </Router>
+        </>
+    );
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

@@ -52,7 +52,9 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                 priority: formData.priority,
                 dueDate: formData.dueDate || null,
                 labels: formData.label ? [formData.label] : null,
-                favorite: formData.favorite
+                favorite: formData.favorite,
+                columnId: card.column?.id || column?.id,
+                position: card.position
             });
             SwipClose();
         } catch (error) {
@@ -66,7 +68,7 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                     <input
                         type="checkbox"
                         checked={formData.favorite}
-                        onChange={e => setFormData({ ...formData, favorite: e.target.checked })}
+                        onChange={e => setFormData(Object.assign({}, formData, { favorite: e.target.checked }))}
                         disabled={isLoading}
                         id="favorite-checkbox-detail"
                     />
@@ -90,7 +92,7 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
 
     return (
         <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${closing ? "animate-scaleOUT" : "animate-scaleIN"}`} onClick={SwipClose}>
-            <div className="bg-secondary p-6 rounded-lg w-[500px] max-w-[90%] border-2 border-accent1 shadow-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-secondary p-6 rounded-lg w-[500px] max-w-[90%] border border-accent1 shadow-lg" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-text text-xl font-museo">Card Details</h2>
                     <button onClick={SwipClose} className="hover:opacity-70 transition" disabled={isLoading}>
@@ -98,21 +100,12 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                     </button>
                 </div>
 
-                <div className="h-[2px] w-full bg-accent1 rounded mb-4"></div>
-
-                <div className="flex flex-col gap-3">
-                    {column && (
-                        <div className="text-sm text-gray-400">
-                            In column: <span className="text-text font-medium">{column.title}</span>
-                        </div>
-                    )}
-
                     <div>
                         <label className="block text-text text-sm mb-1">Title *</label>
                         <input
                             type="text"
                             value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            onChange={(e) => setFormData(Object.assign({}, formData, { title: e.target.value }))}
                             className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1"
                             disabled={isLoading}
                             placeholder="Card title"
@@ -123,7 +116,7 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                         <label className="block text-text text-sm mb-1">Description</label>
                         <textarea
                             value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            onChange={(e) => setFormData(Object.assign({}, formData, { description: e.target.value }))}
                             className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1 resize-none"
                             disabled={isLoading}
                             placeholder="Card description"
@@ -136,7 +129,7 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                             <label className="block text-text text-sm mb-1">Priority</label>
                             <select
                                 value={formData.priority}
-                                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                                onChange={(e) => setFormData(Object.assign({}, formData, { priority: e.target.value }))}
                                 className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1"
                                 disabled={isLoading}
                             >
@@ -151,7 +144,7 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                             <label className="block text-text text-sm mb-1">Label</label>
                             <select
                                 value={formData.label}
-                                onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                                onChange={(e) => setFormData(Object.assign({}, formData, { label: e.target.value }))}
                                 className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1"
                                 disabled={isLoading}
                             >
@@ -168,23 +161,12 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                         <input
                             type="date"
                             value={formData.dueDate}
-                            onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                            onChange={(e) => setFormData(Object.assign({}, formData, { dueDate: e.target.value }))}
                             className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1"
                             disabled={isLoading}
                         />
                     </div>
 
-                    {formData.label && (
-                        <div className="flex items-center gap-2 text-sm">
-                            <span className="text-gray-400">Label preview:</span>
-                            <div
-                                className="px-3 py-1 rounded text-white font-medium"
-                                style={{ backgroundColor: labelColors[formData.label] }}
-                            >
-                                {formData.label}
-                            </div>
-                        </div>
-                    )}
 
                     <div className="flex gap-2 mt-4">
                         <button
@@ -204,6 +186,5 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
                     </div>
                 </div>
             </div>
-        </div>
     );
 }

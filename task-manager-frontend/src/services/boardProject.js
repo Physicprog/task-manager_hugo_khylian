@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SendNotification } from "../utils/notifs.js";
+import { API_URL } from "./authService.js";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:1337";
 
 // Fonction de test pour les notifications
 export function testNotifications() {

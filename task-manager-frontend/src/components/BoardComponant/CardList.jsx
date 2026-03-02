@@ -1,205 +1,331 @@
 import React, { useState } from 'react';
-import {
-    DndContext,
-    DragOverlay,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    closestCorners,
-} from '@dnd-kit/core';
-import { arrayMove, SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, closestCorners } from '@dnd-kit/core';
+import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import Column from './Column.jsx';
 import Card from './Card.jsx';
 import { SendNotification } from "../../utils/notifs.js";
 import { useDragScroll } from "../../utils/dragUtils.js";
 import AddNewColumn from './popUp/listPopUp.jsx';
 
-export default function CardList({ 
-    columns = [], 
-    onColumnAdd, 
-    onColumnEdit, 
-    onColumnDelete, 
-    onOpenAddCard, 
-    onCardClick, 
-    onToggleFavorite,
-    onMoveCard,
-    onMoveColumn 
-}) {
+function getCardId(card) {
+    if (card.documentId) {
+        return card.documentId;
+    } else {
+        return card.id;
+    }
+}
+
+function findColumnByCardId(columns, cardId) {
+    for (let i = 0; i < columns.length; i++) {
+        const col = columns[i];
+        if (col.cards) {
+            for (let j = 0; j < col.cards.length; j++) {
+                const card = col.cards[j];
+                if (getCardId(card) === cardId) {
+                    return i;
+                }
+            }
+        }
+    }
+    return -1;
+}
+
+function handleAddColumn(newColumnTitle, isAddingColumn, onColumnAdd, setNewColumnTitle, setIsAddingColumn) {
+    const trimmedTitle = newColumnTitle.trim();
+    if (trimmedTitle) {
+        if (onColumnAdd) {
+            onColumnAdd(newColumnTitle);
+        }
+        setNewColumnTitle('');
+        setIsAddingColumn(false);
+    } else {
+        SendNotification("Column title cannot be empty", true, false);
+    }
+}
+
+function handleDragStart(event, setActiveCard, setActiveColumn) {
+    const activeType = event.active.data.current;
+    if (activeType) {
+        const type = activeType.type;
+        if (type === "Card") {
+            setActiveCard(activeType.card);
+        } else if (type === "Column") {
+            setActiveColumn(activeType.column);
+        }
+    }
+}
+
+function findCardIndex(cards, cardId) {
+    for (let i = 0; i < cards.length; i++) {
+        if (getCardId(cards[i]) === cardId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function moveCardInArray(cards, fromIndex, toIndex) {
+    const newCards = [];
+    for (let i = 0; i < cards.length; i++) {
+        newCards.push(cards[i]);
+    }
+    const cardToMove = newCards[fromIndex];
+    newCards.splice(fromIndex, 1);
+    newCards.splice(toIndex, 0, cardToMove);
+    return newCards;
+}
+
+function handleCardDragOver(activeId, overId, columns, onMoveCard, isActiveACard, isOverACard, isOverAColumn) {
+    if (!isActiveACard) {
+        return;
+    }
+
+    if (isActiveACard && isOverACard) {
+        const activeColumnIndex = findColumnByCardId(columns, activeId);
+        const overColumnIndex = findColumnByCardId(columns, overId);
+
+        if (activeColumnIndex !== overColumnIndex) {
+            return;
+        }
+
+        const activeColumn = columns[activeColumnIndex];
+        const activeCardIndex = findCardIndex(activeColumn.cards, activeId);
+        const overCardIndex = findCardIndex(activeColumn.cards, overId);
+        const newCards = moveCardInArray(activeColumn.cards, activeCardIndex, overCardIndex);
+        
+        if (onMoveCard) {
+            onMoveCard(activeId, activeColumn.id, activeColumn.id, newCards);
+        }
+    }
+
+    if (isActiveACard && isOverAColumn) {
+        const activeColumnIndex = findColumnByCardId(columns, activeId);
+        const overColumnIndex = findColumnIndexById(columns, overId);
+
+        if (activeColumnIndex !== overColumnIndex) {
+            const activeColumn = columns[activeColumnIndex];
+            const overColumn = columns[overColumnIndex];
+            const activeCard = findCardById(activeColumn.cards, activeId);
+
+            const newActiveCards = removeCardFromCards(activeColumn.cards, activeId);
+            const newOverCards = [activeCard];
+            for (let i = 0; i < overColumn.cards.length; i++) {
+                newOverCards.push(overColumn.cards[i]);
+            }
+
+            if (onMoveCard) {
+                onMoveCard(activeId, activeColumn.id, overColumn.id, newOverCards, newActiveCards);
+            }
+        }
+    }
+}
+
+function findColumnIndexById(columns, columnId) {
+    for (let i = 0; i < columns.length; i++) {
+        if (columns[i].id === columnId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function findCardById(cards, cardId) {
+    for (let i = 0; i < cards.length; i++) {
+        if (getCardId(cards[i]) === cardId) {
+            return cards[i];
+        }
+    }
+    return null;
+}
+
+function removeCardFromCards(cards, cardId) {
+    const newCards = [];
+    for (let i = 0; i < cards.length; i++) {
+        if (getCardId(cards[i]) !== cardId) {
+            newCards.push(cards[i]);
+        }
+    }
+    return newCards;
+}
+
+function handleDragOver(event, columns, onMoveCard) {
+    if (!event.over) {
+        return;
+    }
+
+    const activeId = event.active.id;
+    const overId = event.over.id;
+
+    if (activeId === overId) {
+        return;
+    }
+
+    const activeData = event.active.data.current;
+    const overData = event.over.data.current;
+    
+    const isActiveACard = activeData && activeData.type === "Card";
+    const isOverACard = overData && overData.type === "Card";
+    const isOverAColumn = overData && overData.type === "Column";
+
+    handleCardDragOver(activeId, overId, columns, onMoveCard, isActiveACard, isOverACard, isOverAColumn);
+}
+
+function moveColumnsInArray(columns, fromIndex, toIndex) {
+    const newColumns = [];
+    for (let i = 0; i < columns.length; i++) {
+        newColumns.push(columns[i]);
+    }
+    const columnToMove = newColumns[fromIndex];
+    newColumns.splice(fromIndex, 1);
+    newColumns.splice(toIndex, 0, columnToMove);
+    return newColumns;
+}
+
+function handleColumnDragEnd(activeId, overId, columns, onMoveColumn) {
+    const activeColumnIndex = findColumnIndexById(columns, activeId);
+    const overColumnIndex = findColumnIndexById(columns, overId);
+
+    if (activeColumnIndex !== overColumnIndex) {
+        const newColumns = moveColumnsInArray(columns, activeColumnIndex, overColumnIndex);
+        if (onMoveColumn) {
+            onMoveColumn(newColumns);
+        }
+    }
+}
+
+function handleCardDragEnd(activeId, overId, columns, onMoveCard) {
+    const activeColumnIndex = findColumnByCardId(columns, activeId);
+    const overColumnIndex = findColumnByCardId(columns, overId);
+
+    if (activeColumnIndex !== overColumnIndex) {
+        const activeColumn = columns[activeColumnIndex];
+        const overColumn = columns[overColumnIndex];
+        const activeCard = findCardById(activeColumn.cards, activeId);
+        const overCardIndex = findCardIndex(overColumn.cards, overId);
+
+        const newActiveCards = removeCardFromCards(activeColumn.cards, activeId);
+        const newOverCards = [];
+        for (let i = 0; i < overColumn.cards.length; i++) {
+            newOverCards.push(overColumn.cards[i]);
+        }
+        newOverCards.splice(overCardIndex, 0, activeCard);
+
+        if (onMoveCard) {
+            onMoveCard(activeId, activeColumn.id, overColumn.id, newOverCards, newActiveCards);
+        }
+    }
+}
+
+function handleDragEnd(event, setActiveCard, setActiveColumn, columns, onMoveColumn, onMoveCard) {
+    setActiveCard(null);
+    setActiveColumn(null);
+
+    if (!event.over) {
+        return;
+    }
+
+    const activeId = event.active.id;
+    const overId = event.over.id;
+
+    if (activeId === overId) {
+        return;
+    }
+
+    const activeData = event.active.data.current;
+    const overData = event.over.data.current;
+    
+    const isActiveACard = activeData && activeData.type === "Card";
+    const isOverACard = overData && overData.type === "Card";
+    const isActiveAColumn = activeData && activeData.type === "Column";
+    const isOverAColumn = overData && overData.type === "Column";
+
+    if (isActiveAColumn && isOverAColumn) {
+        handleColumnDragEnd(activeId, overId, columns, onMoveColumn);
+        return;
+    }
+
+    if (isActiveACard && isOverACard) {
+        handleCardDragEnd(activeId, overId, columns, onMoveCard);
+    }
+}
+
+export default function CardList({ columns = [], onColumnAdd, onColumnEdit, onColumnDelete, onOpenAddCard, onCardClick, onToggleFavorite, onMoveCard, onMoveColumn }) {
     const [isAddingColumn, setIsAddingColumn] = useState(false);
     const [newColumnTitle, setNewColumnTitle] = useState('');
     const [activeCard, setActiveCard] = useState(null);
     const [activeColumn, setActiveColumn] = useState(null);
-    const { scrollContainerRef, handleMouseDown, handleMouseMove, handleMouseUp, handleMouseLeave } = useDragScroll();
+    
+    const dragScroll = useDragScroll();
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 3 } }));
+    
+    const columnIds = [];
+    for (let i = 0; i < columns.length; i++) {
+        columnIds.push(columns[i].id);
+    }
 
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 3,
-            },
-        })
-    );
+    function onAddColumn() {
+        handleAddColumn(newColumnTitle, isAddingColumn, onColumnAdd, setNewColumnTitle, setIsAddingColumn);
+    }
 
-    const columnIds = columns.map(col => col.id);
+    function onDragStart(event) {
+        handleDragStart(event, setActiveCard, setActiveColumn);
+    }
 
-    function handleAddColumn() {
-        if (newColumnTitle.trim()) {
-            onColumnAdd && onColumnAdd(newColumnTitle);
-            setNewColumnTitle('');
-            setIsAddingColumn(false);
+    function onDragOver(event) {
+        handleDragOver(event, columns, onMoveCard);
+    }
+
+    function onDragEnd(event) {
+        handleDragEnd(event, setActiveCard, setActiveColumn, columns, onMoveColumn, onMoveCard);
+    }
+
+    const columnElements = [];
+    for (let i = 0; i < columns.length; i++) {
+        const column = columns[i];
+        columnElements.push(
+            <Column 
+                key={column.id} 
+                column={column} 
+                onCardClick={onCardClick} 
+                onOpenAddCard={onOpenAddCard} 
+                onDeleteColumn={onColumnDelete} 
+                onEditColumn={onColumnEdit} 
+                onToggleFavorite={onToggleFavorite} 
+            />
+        );
+    }
+
+    function renderActiveOverlay() {
+        if (activeCard) {
+            return (
+                <div className="rotate-3 shadow-2xl">
+                    <Card card={activeCard} onClick={function(){}} onToggleFavorite={function(){}} />
+                </div>
+            );
+        } else if (activeColumn) {
+            return (
+                <div className="rotate-2 shadow-2xl scale-105">
+                    <Column 
+                        column={activeColumn} 
+                        onCardClick={function(){}} 
+                        onOpenAddCard={function(){}} 
+                        onDeleteColumn={function(){}} 
+                        onEditColumn={function(){}} 
+                        onToggleFavorite={function(){}} 
+                    />
+                </div>
+            );
         } else {
-            SendNotification("Column title cannot be empty", true, false);
+            return null;
         }
     }
-
-    function handleDragStart(event) {
-        const { active } = event;
-        
-        if (active.data.current?.type === "Card") {
-            setActiveCard(active.data.current.card);
-        } else if (active.data.current?.type === "Column") {
-            setActiveColumn(active.data.current.column);
-        }
-    }
-
-    function handleDragOver(event) {
-        const { active, over } = event;
-        if (!over) return;
-
-        const activeId = active.id;
-        const overId = over.id;
-
-        if (activeId === overId) return;
-
-        const isActiveACard = active.data.current?.type === "Card";
-        const isOverACard = over.data.current?.type === "Card";
-        const isOverAColumn = over.data.current?.type === "Column";
-
-        if (!isActiveACard) return;
-
-        // Déplacer une carte vers une autre carte (même colonne ou différente)
-        if (isActiveACard && isOverACard) {
-            const activeColumnIndex = columns.findIndex(col => 
-                col.cards.some(card => card.id === activeId)
-            );
-            const overColumnIndex = columns.findIndex(col => 
-                col.cards.some(card => card.id === overId)
-            );
-
-            if (activeColumnIndex !== overColumnIndex) {
-                return; // Laissé au handleDragEnd pour inter-colonnes
-            }
-
-            // Réorganisation dans la même colonne
-            const activeColumn = columns[activeColumnIndex];
-            const activeCardIndex = activeColumn.cards.findIndex(card => card.id === activeId);
-            const overCardIndex = activeColumn.cards.findIndex(card => card.id === overId);
-
-            const newCards = arrayMove(activeColumn.cards, activeCardIndex, overCardIndex);
-            
-            onMoveCard && onMoveCard(activeId, activeColumn.id, activeColumn.id, newCards);
-        }
-
-        // Déplacer une carte vers une colonne vide
-        if (isActiveACard && isOverAColumn) {
-            const activeColumnIndex = columns.findIndex(col => 
-                col.cards.some(card => card.id === activeId)
-            );
-            const overColumnIndex = columns.findIndex(col => col.id === overId);
-
-            if (activeColumnIndex !== overColumnIndex) {
-                const activeColumn = columns[activeColumnIndex];
-                const overColumn = columns[overColumnIndex];
-                const activeCard = activeColumn.cards.find(card => card.id === activeId);
-
-                const newActiveCards = activeColumn.cards.filter(card => card.id !== activeId);
-                const newOverCards = [activeCard, ...overColumn.cards];
-
-                onMoveCard && onMoveCard(activeId, activeColumn.id, overColumn.id, newOverCards, newActiveCards);
-            }
-        }
-    }
-
-    function handleDragEnd(event) {
-        const { active, over } = event;
-        setActiveCard(null);
-        setActiveColumn(null);
-
-        if (!over) return;
-
-        const activeId = active.id;
-        const overId = over.id;
-
-        if (activeId === overId) return;
-
-        const isActiveACard = active.data.current?.type === "Card";
-        const isOverACard = over.data.current?.type === "Card";
-        const isActiveAColumn = active.data.current?.type === "Column";
-        const isOverAColumn = over.data.current?.type === "Column";
-
-        // Drag & drop des colonnes
-        if (isActiveAColumn && isOverAColumn) {
-            const activeColumnIndex = columns.findIndex(col => col.id === activeId);
-            const overColumnIndex = columns.findIndex(col => col.id === overId);
-
-            if (activeColumnIndex !== overColumnIndex) {
-                const newColumns = arrayMove(columns, activeColumnIndex, overColumnIndex);
-                onMoveColumn && onMoveColumn(newColumns);
-            }
-            return;
-        }
-
-        // Drag & drop des cartes (code existant)
-        if (isActiveACard && isOverACard) {
-            const activeColumnIndex = columns.findIndex(col => 
-                col.cards.some(card => card.id === activeId)
-            );
-            const overColumnIndex = columns.findIndex(col => 
-                col.cards.some(card => card.id === overId)
-            );
-
-            if (activeColumnIndex !== overColumnIndex) {
-                const activeColumn = columns[activeColumnIndex];
-                const overColumn = columns[overColumnIndex];
-                const activeCard = activeColumn.cards.find(card => card.id === activeId);
-                const overCardIndex = overColumn.cards.findIndex(card => card.id === overId);
-
-                const newActiveCards = activeColumn.cards.filter(card => card.id !== activeId);
-                const newOverCards = [...overColumn.cards];
-                newOverCards.splice(overCardIndex, 0, activeCard);
-
-                onMoveCard && onMoveCard(activeId, activeColumn.id, overColumn.id, newOverCards, newActiveCards);
-            }
-        }
-    }
-
 
     return (
-        <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-        >
-            <div ref={scrollContainerRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}
-                className="w-full h-[calc(100vh-180px)] overflow-x-auto overflow-y-hidden p-6 bg-surface cursor-grab select-none hide-scrollbar">
-
+        <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
+            <div ref={dragScroll.scrollContainerRef} onMouseDown={dragScroll.handleMouseDown} onMouseMove={dragScroll.handleMouseMove} onMouseUp={dragScroll.handleMouseUp} onMouseLeave={dragScroll.handleMouseLeave} className="w-full h-[calc(100vh-180px)] overflow-x-auto overflow-y-hidden p-6 bg-surface cursor-grab select-none hide-scrollbar">
                 <div className="flex gap-4 h-full">
-                    <SortableContext 
-                        items={columnIds}
-                        strategy={horizontalListSortingStrategy}
-                    >
-                        {columns.map((column) => (
-                            <Column 
-                                key={column.id} 
-                                column={column} 
-                                onCardClick={onCardClick} 
-                                onOpenAddCard={onOpenAddCard} 
-                                onDeleteColumn={onColumnDelete} 
-                                onEditColumn={onColumnEdit} 
-                                onToggleFavorite={onToggleFavorite} 
-                            />
-                        ))}
+                    <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
+                        {columnElements}
                     </SortableContext>
 
                     <AddNewColumn 
@@ -207,32 +333,13 @@ export default function CardList({
                         setIsAddingColumn={setIsAddingColumn} 
                         newColumnTitle={newColumnTitle} 
                         setNewColumnTitle={setNewColumnTitle} 
-                        handleAddColumn={handleAddColumn} 
+                        handleAddColumn={onAddColumn} 
                     />
                 </div>
             </div>
 
             <DragOverlay>
-                {activeCard ? (
-                    <div className="rotate-3 shadow-2xl">
-                        <Card
-                            card={activeCard}
-                            onClick={() => {}}
-                            onToggleFavorite={() => {}}
-                        />
-                    </div>
-                ) : activeColumn ? (
-                    <div className="rotate-2 shadow-2xl scale-105">
-                        <Column
-                            column={activeColumn}
-                            onCardClick={() => {}}
-                            onOpenAddCard={() => {}}
-                            onDeleteColumn={() => {}}
-                            onEditColumn={() => {}}
-                            onToggleFavorite={() => {}}
-                        />
-                    </div>
-                ) : null}
+                {renderActiveOverlay()}
             </DragOverlay>
         </DndContext>
     );

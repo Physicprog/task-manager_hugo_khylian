@@ -146,7 +146,10 @@ export default function Card({ card, onClick, onToggleFavorite }) {
     const favoriteLabel = card.favorite ? "Remove from favorites" : "Add to favorites";
 
     return (
-        <div ref={sortable.setNodeRef} style={style} {...sortable.attributes} {...sortable.listeners} className={cardClass}>
+        <div ref={sortable.setNodeRef} style={style} className={cardClass}
+             onPointerDown={sortable.listeners && sortable.listeners.onPointerDown ? sortable.listeners.onPointerDown : undefined}
+             tabIndex={sortable.attributes && sortable.attributes.tabIndex ? sortable.attributes.tabIndex : 0}
+             role={sortable.attributes && sortable.attributes.role ? sortable.attributes.role : 'button'}>
             <button className="absolute top-2 right-2 z-10" onClick={onFavoriteClick} aria-label={favoriteLabel}>
                 <img src={favoriteIcon} alt="favorite" className="h-5 w-5" />
             </button>

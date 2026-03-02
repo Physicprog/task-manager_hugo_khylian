@@ -96,7 +96,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                                 <>
                                     <span className="text-text text-sm">{userInfos.username}</span>
                                     <button onClick={ToogleShowMenu} className="w-10 h-10 rounded-full overflow-hidden border-2 border-text p-[2px]">
-                                        <img src={userInfos.avatar} alt="avatar" className="select-none w-10 h-10 rounded-full object-cover border-2 border-text" />
+                                        <img src={userInfos.avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-text" />
                                     </button>
                                     <button onClick={onLogout} className="px-3 py-2 bg-red-500 text-white border-2 border-text rounded-lg text-sm">Logout</button>
                                 </>

@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import  { API_URL }  from "./authService.js";
 
@@ -38,8 +39,6 @@ export async function getBoardDetails(boardId, paramToReturn) {
 
         return board;
     } catch (error) {
-        console.error("Error fetching board details:", error);
-        
         if (error.response) {
             if (error.response.status === 404) {
                 return "Board not found";
@@ -59,14 +58,12 @@ export default async function createBoard(title) {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("User not authenticated");
         const response = await axios.post(`${API_URL}/api/boards`, { title }, {
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+            headers: { "Authorization": `Bearer ${token}` }
         });
 
-        return response.data?.data;
+        return response.data.data;
     }
     catch (error) {
-        console.error("Error creating board:", error);
         throw error;
     }
 }
-

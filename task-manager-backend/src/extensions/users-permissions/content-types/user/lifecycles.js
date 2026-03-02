@@ -32,38 +32,3 @@ module.exports = {
     }
   },
 };
-
-module.exports.deleteMe = async (ctx) => {
-  const user = ctx.state.user;
-  if (!user) {
-    return ctx.unauthorized("You must be logged in to delete your account.");
-  }
-  try {
-    await strapi.db.query('plugin::users-permissions.user').delete({ where: { id: user.id } });
-    ctx.send({ message: "Account deleted successfully." });
-  } catch (err) {
-    ctx.throw(500, "Failed to delete account.");
-  }
-};
-
-strapi.server.routes([
-  {
-    method: 'DELETE',
-    path: '/api/users/me',
-    handler: async (ctx) => {
-      const user = ctx.state.user;
-      if (!user) {
-        return ctx.unauthorized("You must be logged in to delete your account.");
-      }
-      try {
-        await strapi.db.query('plugin::users-permissions.user').delete({ where: { id: user.id } });
-        ctx.send({ message: "Account deleted successfully." });
-      } catch (err) {
-        ctx.throw(500, "Failed to delete account.");
-      }
-    },
-    config: {
-      auth: true,
-    },
-  },
-]);

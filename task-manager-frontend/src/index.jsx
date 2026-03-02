@@ -44,7 +44,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/board/:boardId" element={<BoardDetailled isTemplate={false} />} />
                     <Route path='/template-board' element={<BoardDetailled isTemplate={true} />} />
-                    <Route path="/error/:errorType" element={<ErrorPage />} />
+                    <Route path="*" element={<ErrorPage errorType="404" />} />
                 </Routes>
             </Router>
         </>

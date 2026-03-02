@@ -79,6 +79,8 @@ export default function CardCreatePopup({ column, onClose, onCreate }) {
                 <div className="h-[2px] w-full bg-accent1 rounded mb-4"></div>
 
                 <div className="flex flex-col gap-3">
+
+
                     <div>
                         <label className="block text-text text-sm mb-1">Title *</label>
                         <input

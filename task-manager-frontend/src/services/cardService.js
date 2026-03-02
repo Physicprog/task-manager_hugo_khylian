@@ -40,9 +40,8 @@ export async function createCard(columnId, boardId, cardData) {
             }
         );
 
-        return response.data?.data;
+        return response.data.data;
     } catch (error) {
-        console.error("Error creating card:", error.response?.data || error);
         throw error;
     }
 }
@@ -86,10 +85,8 @@ export async function updateCard(cardId, cardData) {
             }
         );
 
-        return response.data?.data;
+        return response.data.data;
     } catch (error) {
-        console.error("Error updating card:", error);
-        console.error("Card data sent:", cardData);
         throw error;
     }
 }
@@ -116,9 +113,8 @@ export async function moveCard(cardId, targetColumnId, position = 0) {
             }
         );
 
-        return response.data?.data;
+        return response.data.data;
     } catch (error) {
-        console.error("Error moving card:", error);
         throw error;
     }
 }
@@ -155,10 +151,9 @@ export async function getCardsByColumn(columnId) {
         }
         );
 
-        return response.data?.data || [];
+        return response.data && response.data.data ? response.data.data : [];
     } catch (error) {
         console.error("Error fetching cards:", error);
         throw error;
     }
 }
-

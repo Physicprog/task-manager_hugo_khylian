@@ -24,10 +24,8 @@ export default function ColumnDetailPopup({ column, onClose, onUpdate }) {
         setIsLoading(true);
         try {
             await onUpdate(column.id, formData);
-            SendNotification("Column updated successfully");
             SwipClose();
         } catch (error) {
-            console.error('Error updating column:', error);
             SendNotification("Error updating column");
         } finally {
             setIsLoading(false);

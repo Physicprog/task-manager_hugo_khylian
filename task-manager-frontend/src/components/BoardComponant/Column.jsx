@@ -32,13 +32,7 @@ function getCardIds(cards) {
     return cardIds;
 }
 
-function getCardsCount(cards) {
-    if (cards) {
-        return cards.length;
-    } else {
-        return 0;
-    }
-}
+
 
 function getDragColumnClassName(isDragging) {
     if (isDragging) {
@@ -88,8 +82,7 @@ export default function Column({ column, onCardClick, onOpenAddCard, onDeleteCol
     };
 
     const cardIds = getCardIds(column.cards);
-    const cardsCount = getCardsCount(column.cards);
-    const combineRefs = setRefs(sortable.setNodeRef, droppable.setNodeRef);
+        const combineRefs = setRefs(sortable.setNodeRef, droppable.setNodeRef);
     const dragClassName = getDragColumnClassName(sortable.isDragging);
     const columnClass = `flex-shrink-0 w-[280px] bg-secondary rounded-lg p-4 border border-accent1/30 transition-all duration-200 ${dragClassName}`;
 
@@ -122,10 +115,12 @@ export default function Column({ column, onCardClick, onOpenAddCard, onDeleteCol
 
     return (
         <div ref={combineRefs} style={style} className={columnClass}>
-            <div {...sortable.attributes} {...sortable.listeners} className="flex items-center justify-between mb-4 cursor-grab active:cursor-grabbing">
+            <div className="flex items-center justify-between mb-4 cursor-grab active:cursor-grabbing" 
+                 onPointerDown={sortable.listeners && sortable.listeners.onPointerDown ? sortable.listeners.onPointerDown : undefined}
+                 tabIndex={sortable.attributes && sortable.attributes.tabIndex ? sortable.attributes.tabIndex : 0}
+                 role={sortable.attributes && sortable.attributes.role ? sortable.attributes.role : 'button'}>
                 <div className="flex items-center gap-2">
                     <h3 className="text-text font-museo text-lg">{column.title}</h3>
-                    <span className="text-xs text-gray-400 bg-surface px-2 py-1 rounded">{cardsCount}</span>
                 </div>
 
                 <ColumnMenu 

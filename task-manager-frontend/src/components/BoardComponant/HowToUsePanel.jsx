@@ -17,7 +17,7 @@ export default function HowToUsePanel({ onClose }) {
                 <div className="h-[0.6vh] w-[100%] bg-accent1 rounded-[0.55vh] mt-[-8px] mb-4 shadow-[0_0_15px_#6f00ff57]"></div>
 
                 <div className="flex flex-row gap-8 mt-4">
-                    <img className="w-[45%] rounded border border-gray-600 shadow-lg" src="/a_supp.png" />
+                    <img className="w-[45%] rounded border border-gray-600 shadow-lg" src="/HowToUse/BoardNormal.png" />
                     <div className="flex-1">
                         <h6 className="text-xs py-1 ml-4 font-semibold text-text"> Boards Overview</h6>
                         <p className="text-xs py-1 ml-4 font-semibold text-text">• A <span className="font-extrabold text-accent1 underline">board</span> is a workspace where you can organize tasks using columns and cards.</p>
@@ -26,16 +26,25 @@ export default function HowToUsePanel({ onClose }) {
                     </div>
                 </div>
 
-                <div className="flex flex-row gap-8 mt-4">
-                    <div className="flex-1">
-                        <h6 className="text-xs py-1 ml-4 font-semibold text-text"> Column Management</h6>
-                        <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Add Column:</span> Click the + button to create a new column in your board.</p>
-                        <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Rename Column:</span> Click on the column title to edit its name.</p>
-                        <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Delete Column:</span> Click the trash icon to remove a column and all its cards.</p>
-                        <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Drag Columns:</span> Reorder columns by dragging them with your mouse.</p>
-                    </div>
-                    <img className="w-[45%] rounded border border-gray-600 shadow-lg" src="/a_supp.png" />
+                <div className="flex items-center gap-8 mt-4">
+                
+                <div className="w-[50%]">
+                    <h6 className="text-xs py-1 ml-4 font-semibold text-text">Column Management</h6>
+
+                    <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Add Column:</span> Click the "Add new Column" button to create a new column in your board.</p>
+
+                    <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Rename Column:</span> Click on the column title to edit its name.</p>
+
+                    <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Delete Column:</span> Click the trash icon to remove a column and all its cards.</p>
+
+                    <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Drag Columns:</span> Reorder columns by dragging them with your mouse.</p>
                 </div>
+
+                <div className="w-[50%] flex justify-center">
+                    <img className="w-[35%] rounded border border-gray-600 shadow-lg" src="/HowToUse/BoardEdit.png"/>
+                </div>
+
+            </div>
             </div>
 
             <div className="bg-secondary rounded border border-gray-600 w-4/5 p-4 mx-auto my-4">
@@ -43,7 +52,7 @@ export default function HowToUsePanel({ onClose }) {
                 <div className="h-[0.6vh] w-[100%] bg-accent1 rounded-[0.55vh] mt-[-8px] mb-4 shadow-[0_0_15px_#6f00ff57]"></div>
 
                 <div className="flex flex-row gap-8 mt-4">
-                    <img src="/a_supp.png" className="w-[45%] rounded border border-gray-600 shadow-lg" />
+                    <img src="/HowToUse/CardOverview.png" className="w-[45%] rounded border border-gray-600 shadow-lg" />
                     <div className="flex-1">
                         <h6 className="text-xs py-1 ml-4 font-semibold text-text"> Cards Overview</h6>
                         <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Add Card:</span> Click the "Add Card" button in each column to create a new card.</p>

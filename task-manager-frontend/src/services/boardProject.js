@@ -24,7 +24,7 @@ export async function getUserBoardCount() {
         const token = localStorage.getItem("token");
         const user = getUserFromLocalStorage();
 
-        if (!token || !user?.id) {
+        if (!token || !user || !user.id) {
             return 0;
         }
 
@@ -61,7 +61,7 @@ export async function getUserBoardProjects() {
             }
         });
 
-        return res.data?.data || []; // ?. pour eviter les valeurs inexistantes
+        return res.data && res.data.data ? res.data.data : [];
     } catch (error) {
         // si le compte est 401 (token supprimer, utilisateur banni etc...), on deconnecte l'utilisateur
         if (error.response?.status === 401) {
@@ -90,12 +90,12 @@ export async function deleteBoard(boardId) {
 
         return response.data;
     } catch (error) {
-        if (error.response?.status === 401) {
+        if (error.response && error.response.status === 401) {
             handleAuthError();
             throw new Error("Authentication failed");
         }
 
-        const errorMessage = error.response?.data?.error?.message || error.message || "Error deleting board";
+        const errorMessage = error.response && error.response.data && error.response.data.error && error.response.data.error.message ? error.response.data.error.message : error.message || "Error deleting board";
         throw new Error(errorMessage);
     }
 }
@@ -145,7 +145,7 @@ export async function CreateNewRawBoard({ title, description, label, endDate }) 
 
         return response;
     } catch (error) {
-        const errorMessage = error.response?.data?.error?.message || error.message || "Error creating board";
+        const errorMessage = error.response && error.response.data && error.response.data.error && error.response.data.error.message ? error.response.data.error.message : error.message || "Error creating board";
         SendNotification(`Error: ${errorMessage}`, true, false);
         throw new Error(errorMessage);
     }
@@ -167,7 +167,7 @@ export async function updateBoard(boardId, data) {
         SendNotification("Board updated successfully", true, true);
         return res.data;
     } catch (error) {
-        if (error.response?.status === 404) {
+        if (error.response && error.response.status === 404) {
             SendNotification("Board not found. It may have been deleted.", true, false);
         } else {
             SendNotification("Error updating board: " + (error.message), true, false);

@@ -81,11 +81,12 @@ function handleLogin(data, setUser, setUserInfos, setShowLogin) {
     }
 }
 
-function handleLogout(setUser, setUserInfos) {
+function handleLogout(setUser, setUserInfos, navigate) {
     removeElements({ token: 0, userInfo: 0, userGender: 0 });
     setUser(null);
     setUserInfos(getUserInfos(null));
     SendNotification("Logged out successfully", true, true);
+    handleGoHome(navigate);
 }
 
 function createNewColumn(title) {
@@ -128,7 +129,6 @@ function addColumnInTemplate(title, columns, setColumns) {
     const updatedColumns = columns.slice();
     updatedColumns.push(newColumn);
     setColumns(updatedColumns);
-    SendNotification("Column added (template mode, not saved)", true, true);
 }
 
 function addColumnToState(newColumn, columns, setColumns) {
@@ -152,7 +152,6 @@ async function handleUpdateColumn(columnId, data, columns, setColumns) {
     try {
         await updateColumn(columnId, data);
         updateColumnInState(columnId, data, columns, setColumns);
-        SendNotification("Column updated successfully", true, true);
     } catch (error) {
         console.error("Error updating column:", error);
         SendNotification("Error updating column", true, false);
@@ -174,15 +173,10 @@ function updateColumnInState(columnId, data, columns, setColumns) {
 }
 
 async function handleDeleteColumn(columnId, columns, setColumns) {
-    const userConfirmed = confirm("Are you sure you want to delete this column? All cards in this column will be deleted.");
-    if (!userConfirmed) {
-        return;
-    }
 
     try {
         await deleteColumn(columnId);
         removeColumnFromState(columnId, columns, setColumns);
-        SendNotification("Column deleted successfully", true, true);
     } catch (error) {
         console.error("Error deleting column:", error);
         SendNotification("Error deleting column", true, false);
@@ -232,7 +226,6 @@ async function handleCreateCard(columnId, cardData, isTemplate, boardId, columns
         const newCard = createNewCard(cardData);
         const updatedColumns = addCardToColumn(columns, columnId, newCard);
         setColumns(updatedColumns);
-        SendNotification("Card added (template mode, not saved)", true, true);
         return;
     }
     
@@ -293,14 +286,12 @@ async function handleUpdateCard(cardId, cardData, isTemplate, columns, setColumn
     if (isTemplate) {
         const updatedColumns = updateCardInColumns(columns, cardId, cardData);
         setColumns(updatedColumns);
-        SendNotification("Card updated (template mode, not saved)", true, true);
         return;
     }
     
     try {
         await updateCard(cardId, cardData);
         await reloadColumns();
-        SendNotification("Card updated successfully", true, true);
     } catch (error) {
         console.error("Error updating card:", error);
         SendNotification("Error updating card", true, false);
@@ -336,7 +327,6 @@ async function handleDeleteCard(cardId, isTemplate, columns, setColumns, reloadC
     try {
         await deleteCard(cardId);
         await reloadColumns();
-        SendNotification("Card deleted successfully", true, true);
     } catch (error) {
         console.error("Error deleting card:", error);
         SendNotification("Error deleting card", true, false);
@@ -596,7 +586,7 @@ export default function DetailledBoards({ isTemplate = false }) {
     const displayedColumns = getDisplayedColumns(columns, showOnlyFavorites);
 
     function handleLogoutClick() {
-        handleLogout(setUser, setUserInfos);
+        handleLogout(setUser, setUserInfos, navigate);
     }
 
     function handleLoginClick() {

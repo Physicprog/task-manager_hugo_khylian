@@ -156,7 +156,6 @@ export default function Home() {
       await deleteBoard(board.documentId);
     }
 
-    SendNotification("All boards deleted successfully", true, true);
     return true;
   }
 
@@ -226,17 +225,15 @@ export default function Home() {
   }
 
   function checkUserData(data) {
-    return data?.user; // on verifie que toutes les données sont présentes avant de les utiliser
+    return data && data.user && typeof data.user === 'object'; 
   }
 
   async function handleLogin(data) {
     const userData = checkUserData(data);
     
-    if (userData) {
-      updateUserAfterLogin(userData);
+    if (userData && data.user) {
+      updateUserAfterLogin(data.user);
       await loadProjectsAfterLogin();
-    } else {
-      SendNotification("Login failed: No user data received", true, false);
     }
     
     closeLoginAndNewBoard();

@@ -98,7 +98,6 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
     async function deleteBoardById(boardId) {
         try {
             await deleteBoard(boardId);
-            SendNotification("Board deleted successfully", true, true);
             
             if (onDelete) {
                 await onDelete();
@@ -194,7 +193,7 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
                     </div>
                 ) : (
                     items.map(function(item) {
-                        const label = item.label?.toLowerCase();
+                        const label = item.label ? item.label.toLowerCase() : '';
                         const isMenuOpen = isMenuOpenForItem(item);
                         const cardClasses = `relative cursor-pointer h-44 rounded-lg overflow-hidden shadow-buttonLight hover:shadow-buttonDark transition bg-white dark:bg-gray-800`;
 

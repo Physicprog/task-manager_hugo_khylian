@@ -3,7 +3,7 @@ import { SendNotification } from "../utils/notifs.js";
 
 
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:1337";
+export const API_URL = import.meta.env.VITE_API_URL || "http://192.168.1.160:1337" || "http://localhost:1337";
 
 function createAuthHeaders(token) {
     return {
@@ -58,7 +58,16 @@ async function updateUserGenderProfile(jwt, gender) {
 
 function handleRegistrationError(error) {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-        SendNotification(error.response.data.error.message, true, false);
+        const errorMessage = error.response.data.error.message;
+        
+        // Gestion spécifique pour les erreurs courantes
+        if (errorMessage.toLowerCase().includes("username") && errorMessage.toLowerCase().includes("already")) {
+            SendNotification("This username is already taken. Please choose another one.", true, false);
+        } else if (errorMessage.toLowerCase().includes("email") && errorMessage.toLowerCase().includes("already")) {
+            SendNotification("This email is already registered. Please use another email or try logging in.", true, false);
+        } else {
+            SendNotification(errorMessage, true, false);
+        }
     } else if (error.code === "ERR_NETWORK" || error.code === "ECONNREFUSED") {
         SendNotification("Server unavailable or network error, please try again later.", true, false);
     } else {
@@ -264,5 +273,3 @@ export default {
     initializeUserData,
     saveUserGender
 };
-
-

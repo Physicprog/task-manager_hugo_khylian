@@ -79,10 +79,9 @@ export async function getColumnsByBoard(boardId) {
                         board: col.board,
                         createdAt: col.createdAt,
                         updatedAt: col.updatedAt,
-                        cards: cardsResponse.data?.data || []
+                        cards: cardsResponse.data.data || []
                     };
                 } catch (error) {
-                    console.error(`Error fetching cards for column ${col.id}:`, error);
                     return {
                         id: col.id,
                         documentId: col.documentId,
@@ -99,8 +98,6 @@ export async function getColumnsByBoard(boardId) {
 
         return columnsWithCards;
     } catch (error) {
-        console.error("Error fetching columns:", error);
-        
         if (error.response) {
             if (error.response.status === 404) {
                 return "Board not found";

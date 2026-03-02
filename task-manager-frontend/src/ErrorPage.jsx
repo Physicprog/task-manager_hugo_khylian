@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./components/navbar.jsx";
 import Footer from "./components/footer.jsx";
 import { getUserInfos, initializeUserData } from "./services/authService.js";
 import { removeElements } from "./services/storage.js";
 
-function ErrorPage() {
+function ErrorPage({ errorType = "404" }) {
     const navigate = useNavigate();
-    const { errorType } = useParams();
     const [user, setUser] = useState(null);
     const [userInfos, setUserInfos] = useState(getUserInfos(null));
 
@@ -35,17 +34,18 @@ function ErrorPage() {
         navigate('/');
     }
 
+
     function handleGoHomeClick() {
         navigate('/');
     }
 
-    function getErrorContent() {
+    function getErrorContent(errorType) {
         switch (errorType) {
             case "404":
                 return {
                     title: "404",
-                    message: "Board not found",
-                    description: "The board you are looking for does not exist or has been deleted."
+                    message: "Page not found",
+                    description: "The page you are looking for does not exist or has been deleted."
                 };
             case "500":
                 return {
@@ -57,13 +57,13 @@ function ErrorPage() {
                 return {
                     title: "403",
                     message: "Access forbidden", 
-                    description: "You don't have permission to access this board."
+                    description: "You don't have permission to access this resource."
                 };
             case "401":
                 return {
                     title: "401",
                     message: "Unauthorized",
-                    description: "Please log in to access this board."
+                    description: "Please log in to access this content."
                 };
             default:
                 return {
@@ -74,11 +74,11 @@ function ErrorPage() {
         }
     }
 
-    const errorContent = getErrorContent();
+    const errorContent = getErrorContent(errorType);
 
     return (
         <>
-            <Navbar userInfos={userInfos} onLogout={handleLogoutClick} onLoginClick={handleLoginClick} wantToAddSearch={false} isTemplateMode={true} onGoHome={handleGoHomeClick} />
+            <Navbar userInfos={userInfos} onLogout={handleLogoutClick} onLoginClick={handleGoHomeClick} wantToAddSearch={false} isTemplateMode={true} onGoHome={handleGoHomeClick} />
             <div className="flex flex-col items-center justify-center min-h-screen bg-surface">
                 <div className="text-center p-8">
                     <h1 className="text-6xl font-bold text-primary mb-4">{errorContent.title}</h1>

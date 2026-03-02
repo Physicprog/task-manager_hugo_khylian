@@ -1,1 +1,40 @@
-[]
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/users/me",
+      "handler": "user.me",
+      "config": {
+        "policies": [],
+        "prefix": "",
+        "auth": {
+          "scope": ["find"]
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/users/me",
+      "handler": "user.me",
+      "config": {
+        "policies": [],
+        "prefix": "",
+        "auth": {
+          "scope": ["find"]
+        }
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/me",
+      "handler": "user.deleteMe",
+      "config": {
+        "policies": [],
+        "prefix": "",
+        "auth": {
+          "scope": ["find"]
+        }
+      }
+    }
+  ]
+}

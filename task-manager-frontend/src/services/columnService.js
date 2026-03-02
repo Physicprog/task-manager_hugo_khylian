@@ -15,7 +15,7 @@ export async function createColumn(boardId, title) {
 
         return response.data?.data;
     } catch (error) {
-        SendNotification("Error creating column:", true, false);
+        SendNotification("Error creating column: " + error.message, true, false);
     }
 }
 
@@ -31,30 +31,17 @@ export async function updateColumn(columnId, data) {
 
         return response.data?.data;
     } catch (error) {
-        SendNotification("Error updating column:", true, false);
+        SendNotification("Error updating column: " + error.message, true, false);
     }
 }
 
 export async function deleteColumn(columnId) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
-
-        // Strapi v5: use documentId with document endpoint
-        const response = await axios.delete(
-            `${API_URL}/api/columns/${columnId}`,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
-
+        const response = await axios.delete(`${API_URL}/api/columns/${columnId}`,{headers: {"Authorization": `Bearer ${token}`}});
         return response.data;
     } catch (error) {
-        console.error("Error deleting column:", error);
-        throw error;
+        SendNotification("Error deleting column: " + error.message, true, false);
     }
 }
 
@@ -65,48 +52,45 @@ export async function getColumnsByBoard(boardId) {
             return null;
         }
 
-        // Get columns with board only
-        const url = `${API_URL}/api/columns?populate[0]=board&sort=position:asc`;
+        const url = `${API_URL}/api/columns?populate[0]=board&sort=position:asc`; // On trie par ordre de position ascendant pour éviter les problèmes de positionnement 
 
-        const response = await axios.get(url, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
+        const response = await axios.get(url, {headers: {"Authorization": `Bearer ${token}`}});
 
-        // Filter client-side by board documentId
-        const allColumns = response.data?.data || [];
+        const allColumns = response.data.data;
 
         const filteredColumns = allColumns.filter(col => {
             const colBoardId = col.board?.documentId;
             return colBoardId === boardId;
         });
 
-        // Now fetch cards for each column separately
         const columnsWithCards = await Promise.all(
             filteredColumns.map(async (col) => {
                 try {
                     const cardsResponse = await axios.get(
                         `${API_URL}/api/cards?filters[column][id][$eq]=${col.id}&sort=position:asc`,
-                        {
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${token}`
-                            }
-                        }
+                        {headers: { "Authorization": `Bearer ${token}`}}
                     );
 
                     return {
-                        ...col,
-                        documentId: col.documentId, // Keep documentId for updates/deletes
+                        id: col.id,
+                        documentId: col.documentId,
+                        name: col.name,
+                        position: col.position,
+                        board: col.board,
+                        createdAt: col.createdAt,
+                        updatedAt: col.updatedAt,
                         cards: cardsResponse.data?.data || []
                     };
                 } catch (error) {
                     console.error(`Error fetching cards for column ${col.id}:`, error);
                     return {
-                        ...col,
+                        id: col.id,
                         documentId: col.documentId,
+                        name: col.name,
+                        position: col.position,
+                        board: col.board,
+                        createdAt: col.createdAt,
+                        updatedAt: col.updatedAt,
                         cards: []
                     };
                 }

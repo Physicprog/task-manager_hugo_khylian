@@ -12,6 +12,8 @@ import Footer from "./components/footer.jsx";
 import AOS from 'aos';
 import { SendNotification } from "./utils/notifs.js";
 
+
+
 //liste de fonction pour les toogles et les changements d'états
 function setProjectsLoading(setIsLoadingProjects, isLoading) {
   setIsLoadingProjects(isLoading);

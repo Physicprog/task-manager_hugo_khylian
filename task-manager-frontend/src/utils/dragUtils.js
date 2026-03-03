@@ -7,20 +7,26 @@ export function useDragScroll() {
     const [scrollLeft, setScrollLeft] = useState(0);
 
     function handleMouseDown(e) {
+        //pas de drag sur ces zones (evite des problemes de scroll horizontal)
         const target = e.target;
-        if (target.closest('button') || target.closest('input') || target.closest('textarea')) return;
+        if (target.closest('[data-dnd-kit-sortable]') || //bloque sur les card et colonnes
+            target.closest('button') || 
+            target.closest('input') || 
+            target.closest('textarea')) {
+            return;
+        }
 
         setIsDragging(true);
-        setStartX(e.pageX - scrollContainerRef.current.offsetLeft); //on prend la position de la souris par rapport au container de scroll pour que le scroll suive la souris
-        setScrollLeft(scrollContainerRef.current.scrollLeft); //ce code permet que le scroll suive la souris
+        setStartX(e.pageX - scrollContainerRef.current.offsetLeft); // Position de la souris par rapport au conteneur
+        setScrollLeft(scrollContainerRef.current.scrollLeft); // Position du scroll actuelle 
     }
 
     function handleMouseMove(e) {
         if (!isDragging) return;
         e.preventDefault();
-        const x = e.pageX - scrollContainerRef.current.offsetLeft; //x vaut la position de la souris par rapport au container de scroll
-        const walk = (x - startX) * 1; //permet de changer le coefficient de glissement
-        scrollContainerRef.current.scrollLeft = scrollLeft - walk; //scrollLeft est la position de départ du scroll, walk est la distance parcourue par la souris depuis le début du drag, on soustrait walk pour que le scroll suive la souris
+        const x = e.pageX - scrollContainerRef.current.offsetLeft; //x bouge par rapport au conteneur
+        const walkpeed = (x - startX) * 1; 
+        scrollContainerRef.current.scrollLeft = scrollLeft - walkpeed;
     }
 
     function stopDragging() {

@@ -1,7 +1,6 @@
 import React from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useState } from 'react';
+import { useSortable } from '@dnd-kit/sortable'; //permet de faire des échanges en gardant les positions 
+import { CSS } from '@dnd-kit/utilities'; //necessaire pour faire le style de l'élément en cours de drag
 
 const fav = "/fav.png";
 const nofav = "/nofav.png";
@@ -24,60 +23,30 @@ const labelColors = {
 };
 
 function formatDate(dateString) {
-    if (!dateString) {
-        return null;
-    }
+    if (!dateString) return null;
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
 }
 
-function handleFavoriteClick(event, card, onToggleFavorite) {
-    event.stopPropagation();
-    if (onToggleFavorite) {
-        onToggleFavorite(card);
-    }
-}
-
-function handleCardClick(card, onClick) {
-    if (onClick) {
-        onClick(card);
-    }
-}
-
 function getPriorityColor(priority) {
-    if (priorityColors[priority]) {
-        return priorityColors[priority];
-    } else {
-        return priorityColors.normal;
+    if (priorityColors[priority]){
+         return priorityColors[priority]
+    }else{
+        return priorityColors['normal'];
     }
 }
 
 function getFavoriteIcon(isFavorite) {
-    if (isFavorite) {
-        return fav;
-    } else {
-        return nofav;
-    }
-}
-
-function getDragOpacity(isDragging) {
-    if (isDragging) {
-        return 0.3;
-    } else {
-        return 1;
-    }
-}
-
-function getDragClassName(isDragging) {
-    if (isDragging) {
-        return 'opacity-30 scale-105 z-50';
-    } else {
-        return '';
-    }
+    if (isFavorite) return fav;
+    return nofav;
 }
 
 export default function Card({ card, onClick, onToggleFavorite }) {
     const cardId = card.documentId || card.id;
+    const priorityColor = getPriorityColor(card.priority);
+    const favoriteIcon = getFavoriteIcon(card.favorite);
+    const favoriteLabel = card.favorite ? "Remove from favorites" : "Add to favorites";
+
     const sortable = useSortable({
         id: cardId,
         data: {
@@ -86,25 +55,18 @@ export default function Card({ card, onClick, onToggleFavorite }) {
         }
     });
 
-    const dragOpacity = getDragOpacity(sortable.isDragging);
-    const dragClassName = getDragClassName(sortable.isDragging);
-    const priorityColor = getPriorityColor(card.priority);
-    const favoriteIcon = getFavoriteIcon(card.favorite);
-
     const style = {
         transform: CSS.Transform.toString(sortable.transform),
         transition: sortable.transition,
-        opacity: dragOpacity,
     };
 
-    const cardClass = `bg-cardBg border-2 ${priorityColor} rounded-xl p-3 cursor-pointer hover:shadow-md transition-all duration-200 relative ${dragClassName}`;
-
     function onFavoriteClick(e) {
-        handleFavoriteClick(e, card, onToggleFavorite);
+        e.stopPropagation();
+        if (onToggleFavorite) onToggleFavorite(card);
     }
 
     function onCardClickHandler() {
-        handleCardClick(card, onClick);
+        if (onClick) onClick(card);
     }
 
     function renderLabels() {
@@ -119,19 +81,14 @@ export default function Card({ card, onClick, onToggleFavorite }) {
                     </div>
                 );
             }
-            return (
-                <div className="flex gap-1">
-                    {labelElements}
-                </div>
-            );
+            return <div className="flex gap-1">{labelElements}</div>;
         }
         return null;
     }
 
     function renderDueDate() {
         if (card.dueDate) {
-            const formattedDate = formatDate(card.dueDate);
-            return <span className="text-xs text-gray-400">{formattedDate}</span>;
+            return <span className="text-xs text-gray-400">{formatDate(card.dueDate)}</span>;
         }
         return null;
     }
@@ -143,17 +100,19 @@ export default function Card({ card, onClick, onToggleFavorite }) {
         return null;
     }
 
-    const favoriteLabel = card.favorite ? "Remove from favorites" : "Add to favorites";
+    const dragClassName = sortable.isDragging ? 'opacity-50 scale-105' : 'hover:shadow-md';
+    
+    const cardClass = `bg-cardBg border-2 ${priorityColor} rounded-xl p-3 cursor-pointer transition-all duration-200 relative ${dragClassName}`;
 
     return (
-        <div ref={sortable.setNodeRef} style={style} className={cardClass}
-             onPointerDown={sortable.listeners && sortable.listeners.onPointerDown ? sortable.listeners.onPointerDown : undefined}
-             tabIndex={sortable.attributes && sortable.attributes.tabIndex ? sortable.attributes.tabIndex : 0}
-             role={sortable.attributes && sortable.attributes.role ? sortable.attributes.role : 'button'}>
+        <div ref={sortable.setNodeRef} style={style} className={cardClass} data-dnd-kit-sortable="true"
+            tabIndex={sortable.attributes && sortable.attributes.tabIndex ? sortable.attributes.tabIndex : 0} //rend focusable pour le clavier
+            role={sortable.attributes && sortable.attributes.role ? sortable.attributes.role : 'button'} //role de button pour les lecteurs d'écran
+            onPointerDown={sortable.listeners && sortable.listeners.onPointerDown ? sortable.listeners.onPointerDown : undefined}>{/*onPointerDown pour le drag & drop*/}
             <button className="absolute top-2 right-2 z-10" onClick={onFavoriteClick} aria-label={favoriteLabel}>
                 <img src={favoriteIcon} alt="favorite" className="h-5 w-5" />
             </button>
-            
+
             <div onClick={onCardClickHandler}>
                 <h4 className="text-text font-medium text-sm mb-1">{card.title}</h4>
                 {renderDescription()}
@@ -162,7 +121,6 @@ export default function Card({ card, onClick, onToggleFavorite }) {
                     <div className="flex items-center gap-2">
                         {renderLabels()}
                     </div>
-
                     <div className="flex items-center gap-2">
                         {renderDueDate()}
                         <span className="text-xs text-gray-500 capitalize">{card.priority}</span>

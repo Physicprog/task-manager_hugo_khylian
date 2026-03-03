@@ -14,7 +14,6 @@ import { SendNotification } from "./utils/notifs.js";
 
 
 
-//liste de fonction pour les toogles et les changements d'états
 function setProjectsLoading(setIsLoadingProjects, isLoading) {
   setIsLoadingProjects(isLoading);
 }
@@ -195,13 +194,13 @@ export default function Home() {
     }
   }
 
+
+  /* Important: permet de charger les infos dès que l'utilisateur se connecte*/
   useEffect(function() {
     const token = checkToken();
-    
     if (!token) {
       return;
     }
-
     initializeUserAndProjects();
   }, []);
 
@@ -266,7 +265,7 @@ export default function Home() {
   function showLoginModal() {
     setShowLogin(true);
     setShowNewBoard(false);
-    incrementCloseMenu();
+    incrementCloseMenu(); 
   }
 
   function showNewBoardModal() {
@@ -309,7 +308,6 @@ export default function Home() {
 
                   {isLoadingProjects && (
                     <div className="text-center text-text py-8">
-                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-accent1"></div>
                       <p className="mt-2">Loading projects...</p>
                     </div>
                   )}

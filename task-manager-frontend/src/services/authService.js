@@ -3,13 +3,10 @@ import { SendNotification } from "../utils/notifs.js";
 
 
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://192.168.1.160:1337" || "http://localhost:1337";
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:1337";
 
 function createAuthHeaders(token) {
-    return {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json"
-    };
+    return {headers: {"Authorization": `Bearer ${token}`}};
 }
 
 function saveUserToStorage(user) {
@@ -29,7 +26,7 @@ export async function updateUserProfile(token, userData) {
         const response = await axios.put(API_URL + "/api/users/me", userData, { headers });
         return response.data;
     } catch (error) {
-        throw error;
+        console.log("Error updating user profile", error);
     }
 }
 
@@ -88,7 +85,7 @@ export async function register(data) {
         return { data: response.data, user: user };
     } catch (error) {
         handleRegistrationError(error);
-        throw error;
+        console.log("Registration error", error);
     }
 }
 
@@ -122,13 +119,11 @@ async function getUserGender(jwt, user) {
 
 function handleLoginError(error) {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-        throw new Error(error.response.data.error.message);
-    } else if (error.code === "ERR_NETWORK" || error.code === "ECONNREFUSED") {
-        throw new Error("Server unavailable or network error, please try again later.");
+        SendNotification(error.response.data.error.message, true, false);
+    }else {
+        SendNotification("An error occurred during login.", true, false);
     }
-    throw new Error("An error occurred during login.");
 }
-
 export async function login(data) {
     try {
         const postData = createLoginData(data);
@@ -159,8 +154,8 @@ function setUserGenderFromStorage(user) {
 
 export async function getUserProfile(token) {
     try {
-        const headers = { Authorization: "Bearer " + token };
-        const response = await axios.get(API_URL + "/api/users/me", { headers });
+        const headers = createAuthHeaders(token);
+        const response = await axios.get(API_URL + "/api/users/me", headers);
 
         const user = response.data;
         setUserGenderFromStorage(user);
@@ -168,7 +163,8 @@ export async function getUserProfile(token) {
 
         return user;
     } catch (error) {
-        throw error;
+        console.log("Error fetching user profile", error);
+        return null;
     }
 }
 
@@ -261,15 +257,29 @@ export function saveUserGender(gender) {
     return true;
 }
 
-// Default export pour compatibilité
-export default {
-    API_URL,
-    updateUserProfile,
-    register,
-    login,
-    getUserProfile,
-    getUserInfos,
-    getUserInfoFromStorage,
-    initializeUserData,
-    saveUserGender
-};
+export async function deleteUserAccount() {
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            SendNotification("User not authenticated", true, false);
+            return;
+        }
+
+        const headers = createAuthHeaders(token);
+        const response = await axios.delete(API_URL + "/api/users/me", { headers });
+        
+        localStorage.removeItem("token");
+        localStorage.removeItem("userInfo");
+        localStorage.removeItem("userGender");
+        
+        SendNotification("Account deleted successfully", false, true);
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+            const errorMessage = error.response.data.error.message;
+            SendNotification("Error deleting account: " + errorMessage, true, false);
+        } 
+    }
+}
+
+export default {API_URL, updateUserProfile, register, login, getUserProfile, getUserInfos, getUserInfoFromStorage, initializeUserData, saveUserGender, deleteUserAccount};

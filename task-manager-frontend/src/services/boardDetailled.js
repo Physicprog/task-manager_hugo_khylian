@@ -11,12 +11,7 @@ export async function getBoardDetails(boardId, paramToReturn) {
 
         const response = await axios.get(
             `${API_URL}/api/boards/${boardId}?populate[columns][populate]=*&populate[cards][populate]=*`,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            }
+            {headers: {"Authorization": `Bearer ${token}`}}
         );
 
         const board = response.data?.data;
@@ -56,7 +51,10 @@ export async function getBoardDetails(boardId, paramToReturn) {
 export default async function createBoard(title) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
+        if (!token) {
+            SendNotification("User not authenticated", true, false);
+            return;
+        }
         const response = await axios.post(`${API_URL}/api/boards`, { title }, {
             headers: { "Authorization": `Bearer ${token}` }
         });
@@ -64,6 +62,6 @@ export default async function createBoard(title) {
         return response.data.data;
     }
     catch (error) {
-        throw error;
+        console.log("Error creating board", error);
     }
 }

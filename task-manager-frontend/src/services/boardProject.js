@@ -1,15 +1,6 @@
 import axios from "axios";
 import { SendNotification } from "../utils/notifs.js";
-import { API_URL } from "./authService.js";
-
-
-// Fonction de test pour les notifications
-export function testNotifications() {
-    SendNotification("Test notification - Success!", true, true);
-    setTimeout(() => {
-        SendNotification("Test notification - Error!", true, false);
-    }, 3000);
-}
+import { API_URL, getUserInfoFromStorage } from "./authService.js";
 
 //deconnecte l'utilisateur et refresh la page
 function handleAuthError() {
@@ -22,13 +13,12 @@ function handleAuthError() {
 export async function getUserBoardCount() {
     try {
         const token = localStorage.getItem("token");
-        const user = getUserFromLocalStorage();
+        const user = getUserInfoFromStorage();
 
         if (!token || !user || !user.id) {
             return 0;
         }
 
-        // Utiliser getUserBoardProjects qui fonctionne déjà
         const boards = await getUserBoardProjects();
         const count = boards.length;
 
@@ -41,7 +31,7 @@ export async function getUserBoardCount() {
 export async function getUserBoardProjects() {
     try {
         const token = localStorage.getItem("token");
-        const user = getUserFromLocalStorage();
+        const user = getUserInfoFromStorage();
 
         if (!token) {
             SendNotification("No token found, please login", true, false);
@@ -55,10 +45,7 @@ export async function getUserBoardProjects() {
 
         // on filtre les boards par user id recuperer de localstorage puis on fait populate pour recuperer les infos user
         const res = await axios.get(`${API_URL}/api/boards?filters[user][id][$eq]=${user.id}&populate=user`, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+            headers: {"Authorization": `Bearer ${token}`}
         });
 
         return res.data && res.data.data ? res.data.data : [];
@@ -78,25 +65,24 @@ export async function deleteBoard(boardId) {
     try {
         const token = localStorage.getItem("token");
         if (!token) {
-            throw new Error("No authentication token found");
+            SendNotification("User not authenticated", true, false);
+            return;
         }
 
         const response = await axios.delete(`${API_URL}/api/boards/${boardId}`, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+            headers: {"Authorization": `Bearer ${token}`}
         });
 
         return response.data;
     } catch (error) {
         if (error.response && error.response.status === 401) {
             handleAuthError();
-            throw new Error("Authentication failed");
+            SendNotification("Board not found or already deleted", true, false);
+            return;
         }
 
         const errorMessage = error.response && error.response.data && error.response.data.error && error.response.data.error.message ? error.response.data.error.message : error.message || "Error deleting board";
-        throw new Error(errorMessage);
+        SendNotification(`Error: ${errorMessage}`, true, false);
     }
 }
 
@@ -104,20 +90,22 @@ export async function CreateNewRawBoard({ title, description, label, endDate }) 
     try {
         const token = localStorage.getItem("token");
         if (!token) {
-            throw new Error("User not authenticated. Please login first.");
+            SendNotification("User not authenticated", true, false);
+            return;
         }
 
         const user = getUserFromLocalStorage();
         if (!user || !user.id) {
-            throw new Error("User information not found. Please login again.");
+            SendNotification("User information not found. Please login again.", true, false);
+            return;
         }
 
-        //check le nombre de board de l'utilisateur (pas de DDOS)
+        //pour eviter de saturer la base
         const boardCount = await getUserBoardCount();
 
         if (boardCount >= 20) {
             SendNotification("Limit reached: you cannot create more than 20 boards.", true, false);
-            throw new Error("Board creation limit reached");
+            return;
         }
 
         const boardData = { // boards afficher par defaut
@@ -134,10 +122,7 @@ export async function CreateNewRawBoard({ title, description, label, endDate }) 
         const response = await axios.post(`${API_URL}/api/boards`, {
             data: boardData
         }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
+            headers: {"Authorization": `Bearer ${token}`}
         });
 
 
@@ -147,32 +132,28 @@ export async function CreateNewRawBoard({ title, description, label, endDate }) 
     } catch (error) {
         const errorMessage = error.response && error.response.data && error.response.data.error && error.response.data.error.message ? error.response.data.error.message : error.message || "Error creating board";
         SendNotification(`Error: ${errorMessage}`, true, false);
-        throw new Error(errorMessage);
     }
 }
 
 export async function updateBoard(boardId, data) {
     try {
         const token = localStorage.getItem("token");
-
-        // Utiliser documentId si disponible, sinon utiliser boardId
         const idToUse = boardId;
 
         const endDateToSend = data.endDate === "" ? null : data.endDate;
 
         const res = await axios.put(`${API_URL}/api/boards/${idToUse}`, {
             data: { title: data.title, description: data.description, label: data.label, endDate: endDateToSend }
-        }, { headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } });
+        }, { headers: {"Authorization": `Bearer ${token}` } });
 
-        SendNotification("Board updated successfully", true, true);
         return res.data;
     } catch (error) {
         if (error.response && error.response.status === 404) {
             SendNotification("Board not found. It may have been deleted.", true, false);
         } else {
-            SendNotification("Error updating board: " + (error.message), true, false);
+            SendNotification("Error updating board: ", true, false);
         }
-        throw error;
+        console.log("Error updating board", error);
     }
 }
 

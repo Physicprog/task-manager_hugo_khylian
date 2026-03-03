@@ -144,8 +144,8 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
         }
     }
 
-    function getCardWidth(isMobile) {
-        return isMobile ? "100%" : "calc(20% - 1rem)";
+    function getCardWidth(isMobile) { 
+        return isMobile ? "100%" : "calc(20% - 16px)"; 
     }
 
     function isMenuOpenForItem(item) {
@@ -250,10 +250,8 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
 
             {showModifyPopup && selectedItem && (
                 <NewBoardSettings onClose={handleCloseModifyPopup} onOpen={handleModifyComplete}
-                    onBoardNotFound={handleBoardNotFoundError} editMode={true}
-                    boardToEdit={{
-                        ...selectedItem, id: selectedItem.documentId || selectedItem.id
-                    }}
+                    onBoardNotFound={handleBoardNotFoundError} editMode={true} 
+                    boardToEdit={{...selectedItem, id: selectedItem.documentId || selectedItem.id }} //on s'assure d'avoir l'id dans boardToEdit, que ce soit documentId ou id selon la source des données
                 />
             )}
         </>

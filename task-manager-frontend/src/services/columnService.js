@@ -6,14 +6,17 @@ import  { API_URL } from "./authService.js";
 export async function createColumn(boardId, title) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
+        if (!token) {
+            SendNotification("User not authenticated", true, false);
+            return;
+        }
 
         const response = await axios.post(`${API_URL}/api/columns`,
             { data: { name: title, board: boardId, position: 0} },
             {headers: {"Authorization": `Bearer ${token}`}}
         );
 
-        return response.data?.data;
+        return response.data.data || null;
     } catch (error) {
         SendNotification("Error creating column: " + error.message, true, false);
     }
@@ -22,16 +25,43 @@ export async function createColumn(boardId, title) {
 export async function updateColumn(columnId, data) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
+        if (!token) {
+            SendNotification("User not authenticated", true, false);
+            return;
+        }
 
         const response = await axios.put(`${API_URL}/api/columns/${columnId}`,
-            {data: {name: data.title}
-            },{headers: {"Authorization": `Bearer ${token}`}}
+            {data: {name: data.title}},{headers: {"Authorization": `Bearer ${token}`}}
         );
 
-        return response.data?.data;
+        return response.data.data || null;
     } catch (error) {
         SendNotification("Error updating column: " + error.message, true, false);
+    }
+}
+
+export async function updateColumnsPositions(columns) {
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            SendNotification("User not authenticated", true, false);
+            return;
+        }
+
+        const promises = [];
+        for (let i = 0; i < columns.length; i++) {
+            const column = columns[i];
+            const updatePromise = axios.put(`${API_URL}/api/columns/${column.id}`,
+                {data: {position: i}},{headers: {"Authorization": `Bearer ${token}`}}
+            );
+            promises.push(updatePromise);
+        }
+
+        await Promise.all(promises);
+        return true;
+    } catch (error) {
+        SendNotification("Error updating columns positions: " + error.message, true, false);
+        return false;
     }
 }
 
@@ -45,69 +75,70 @@ export async function deleteColumn(columnId) {
     }
 }
 
+
+
 export async function getColumnsByBoard(boardId) {
     try {
         const token = localStorage.getItem("token");
         if (!token) {
             return null;
         }
-
-        const url = `${API_URL}/api/columns?populate[0]=board&sort=position:asc`; // On trie par ordre de position ascendant pour éviter les problèmes de positionnement 
-
-        const response = await axios.get(url, {headers: {"Authorization": `Bearer ${token}`}});
+        //on recupere directement les colonnes du board (filtre par board) et on les trie pour les afficher dans l'ordre
+        const response = await axios.get(
+            `${API_URL}/api/columns?populate[0]=board&sort=position:asc`,
+            { headers: { "Authorization": `Bearer ${token}` } }
+        );
 
         const allColumns = response.data.data;
+        const filteredColumns = [];
 
- 
-        const filteredColumns = allColumns.filter(col => {
-            const colBoardId = col.board?.documentId;
-            return colBoardId === boardId;
-        });
+        //on garde que les colonne du board ouvert actuellement
+        for (let i = 0; i < allColumns.length; i++) {
+            const col = allColumns[i];
+            const colBoardId = col.board ? col.board.documentId : undefined; //on check si la colonne a un board associé avec le bon id
+            if (colBoardId === boardId) {
+                filteredColumns.push(col); //si c'est le cas on garde la colonne dans filteredColumns
+            }
+        }
 
-        const columnsWithCards = await Promise.all(
-            filteredColumns.map(async (col) => {
-                try {
-                    const cardsResponse = await axios.get(
-                        `${API_URL}/api/cards?filters[column][id][$eq]=${col.id}&sort=position:asc`,
-                        {headers: { "Authorization": `Bearer ${token}`}}
-                    );
+        const columnsWithCards = [];
 
-                    return {
-                        id: col.id,
-                        documentId: col.documentId,
-                        name: col.name,
-                        position: col.position,
-                        board: col.board,
-                        createdAt: col.createdAt,
-                        updatedAt: col.updatedAt,
-                        cards: cardsResponse.data.data || []
-                    };
-                } catch (error) {
-                    return {
-                        id: col.id,
-                        documentId: col.documentId,
-                        name: col.name,
-                        position: col.position,
-                        board: col.board,
-                        createdAt: col.createdAt,
-                        updatedAt: col.updatedAt,
-                        cards: []
-                    };
-                }
-            })
-        );
+        for (let i = 0; i < filteredColumns.length; i++) {
+            const col = filteredColumns[i];
+            let cards = [];
+            try { /*on recupere toutes les cartes de la colonne, et pour toutes les colonnes */
+                const cardsResponse = await axios.get(
+                    `${API_URL}/api/cards?filters[column][id][$eq]=${col.id}&sort=position:asc`,
+                    { headers: { "Authorization": `Bearer ${token}` } }
+                );
+                cards = cardsResponse.data.data || [];
+            } catch (error) {
+                cards = [];
+            }
+
+            columnsWithCards.push({ //on construit un objet pour chaque colonne avec ses cartes associées dessus
+                id: col.id,
+                documentId: col.documentId,
+                name: col.name,
+                position: col.position,
+                board: col.board,
+                createdAt: col.createdAt,
+                updatedAt: col.updatedAt,
+                cards: cards});
+        }
 
         return columnsWithCards;
     } catch (error) {
         if (error.response) {
             if (error.response.status === 404) {
-                return "Board not found";
-            }
-            if (error.response.status === 401 || error.response.status === 403) {
+                SendNotification("Board not found", false, false);
+                return null;
+            } else {
+                SendNotification("Server error", true, false);
                 return null;
             }
         }
-        
-        return "Server error";
+        SendNotification("Server error while fetching columns", true, false);
+        return null;
     }
 }

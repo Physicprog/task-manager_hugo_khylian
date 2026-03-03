@@ -32,16 +32,13 @@ export default function HowToUsePanel({ onClose }) {
                     <h6 className="text-xs py-1 ml-4 font-semibold text-text">Column Management</h6>
 
                     <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Add Column:</span> Click the "Add new Column" button to create a new column in your board.</p>
-
                     <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Rename Column:</span> Click on the column title to edit its name.</p>
-
                     <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Delete Column:</span> Click the trash icon to remove a column and all its cards.</p>
-
                     <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Drag Columns:</span> Reorder columns by dragging them with your mouse.</p>
                 </div>
 
                 <div className="w-[50%] flex justify-center">
-                    <img className="w-[35%] rounded border border-gray-600 shadow-lg" src="/HowToUse/BoardEdit.png"/>
+                    <img className="w-[35%] shadow-lg" src="/HowToUse/CreateNewCard.png"/>
                 </div>
 
             </div>
@@ -52,7 +49,7 @@ export default function HowToUsePanel({ onClose }) {
                 <div className="h-[0.6vh] w-[100%] bg-accent1 rounded-[0.55vh] mt-[-8px] mb-4 shadow-[0_0_15px_#6f00ff57]"></div>
 
                 <div className="flex flex-row gap-8 mt-4">
-                    <img src="/HowToUse/CardOverview.png" className="w-[45%] rounded border border-gray-600 shadow-lg" />
+                    <img src="/HowToUse/beforeDrag.png" className="w-[45%] shadow-lg" />
                     <div className="flex-1">
                         <h6 className="text-xs py-1 ml-4 font-semibold text-text"> Cards Overview</h6>
                         <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Add Card:</span> Click the "Add Card" button in each column to create a new card.</p>
@@ -73,12 +70,12 @@ export default function HowToUsePanel({ onClose }) {
                 </div>
             </div>
 
-            <div className="bg-secondary rounded border border-gray-600 w-4/5 p-4 mx-auto my-4">
+            <div className="bg-secondary rounded border border-gray-600 w-4/5 p-4 mx-auto my-4" >
                 <h2 className="mb-2 text-center text-xl font-extrabold text-white">Drag & Drop</h2>
                 <div className="h-[0.6vh] w-[100%] bg-accent1 rounded-[0.55vh] mt-[-8px] mb-4 shadow-[0_0_15px_#6f00ff57]"></div>
 
                 <div className="flex flex-row gap-8 mt-4">
-                    <img src="./a_supp.png" className="w-[45%] rounded border border-gray-600 shadow-lg" />
+                    <img src="/HowToUse/InUse.png" className="w-[45%] shadow-lg" />
                     <div className="mt-12 flex-1">
                         <p className="text-xs py-1 ml-4 font-semibold text-gray-200">• <span className="font-extrabold text-accent1 underline">Drag Cards:</span> Click and hold a card or a list, then drag it to move it between columns or reorder within a column.</p>
                     </div>
@@ -89,11 +86,14 @@ export default function HowToUsePanel({ onClose }) {
                         <p className="text-xs py-1 ml-4 font-semibold text-gray-200">• <span className="font-extrabold text-accent1 underline">Visual Feedback:</span> See real-time visual feedback as you drag cards around the board.</p>
                         <p className="text-xs py-1 ml-4 font-semibold text-gray-200">• <span className="font-extrabold text-accent1 underline">Auto-Save:</span> Changes are automatically saved when you drop a card. Card's positions will still here after page refresh.</p>
                     </div>
-                    <img src="./a_supp.png" className="w-[45%] rounded border border-gray-600 shadow-lg" />
+                    <img src="/HowToUse/afterDrop.png" className="w-[35%]  mr-12 shadow-lg" />
                 </div>
 
                 <div className="flex flex-row gap-8 mt-4">
-                    <img src="./a_supp.png" className="w-[45%] rounded border border-gray-600 shadow-lg" />
+
+                        <img src="/HowToUse/dragColomn.png" className="w-[35%] ml-6 pb-[20px] shadow-lg" />
+
+
                     <div className="mt-14 flex-1">
                         <p className="text-xs py-1 ml-4 font-semibold text-gray-200">• <span className="font-extrabold text-accent1 underline">Reorder Columns:</span> Drag list to reorganize your workflow stages in the order that fits your process.</p>
                     </div>
@@ -104,16 +104,19 @@ export default function HowToUsePanel({ onClose }) {
                         <p className="text-xs py-1 ml-4 font-semibold text-gray-200">• <span className="font-extrabold text-accent1 underline">Error Handling:</span> If you drag somewhere impossible, the card will return to its original position automatically.</p>
                         <p className="text-xs py-1 ml-4 font-semibold text-gray-200">• <span className="font-extrabold text-accent1 underline">Prioritize Tasks:</span> Easily move cards up and down to prioritize your work.</p>
                     </div>
-                    <img src="./a_supp.png" className="w-[45%] rounded border border-gray-600 shadow-lg" />
+
+                    <div className=" flex justify-center">
+                        <img src="/HowToUse/BoardEdit.png" className="w-[75%]  mb-6 mr-6 shadow-lg" />
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-secondary rounded border border-gray-600 w-4/5 p-4 mx-auto my-4 mb-8">
+            <div className="bg-secondary rounded border border-gray-600 w-4/5 p-4 mx-auto my-4 mb-8" >
                 <h2 className="mb-2 text-center text-xl font-extrabold text-white">Account & Security</h2>
                 <div className="h-[0.6vh] w-[100%] bg-accent1 rounded-[0.55vh] mt-[-8px] mb-4 shadow-[0_0_15px_#6f00ff57]"></div>
 
                 <div className="flex flex-row gap-8 mt-4">
-                    <img src="./a_supp.png" className="w-[45%] rounded border border-gray-600 shadow-lg" />
+                    <img src="/HowToUse/Register.png" className="w-[25%] shadow-lg" />
                     <div className="flex-1">
                         <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Sign Up: </span> Create your account with email, password and username to get started.</p>
                         <p className="text-xs py-1 ml-4 font-semibold text-text">• <span className="font-extrabold text-accent1 underline">Login:</span> Access your personal boards by logging in with your username and password.</p>

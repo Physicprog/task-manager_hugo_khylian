@@ -1,65 +1,66 @@
 import axios from "axios";
-import  { API_URL } from "./authService.js";
+import  { API_URL, getUserInfoFromStorage } from "./authService.js";
+import { SendNotification } from "../utils/notifs.js";
 
 export async function createCard(columnId, boardId, cardData) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
-
-        // Récupérer les cartes existantes de la colonne pour calculer la position
+        if (!token) {
+            SendNotification("User not authenticated", true, false);
+            return;
+        }
         const existingCards = await getCardsByColumn(columnId);
         let nextPosition = 0;
         
         if (existingCards && existingCards.length > 0) {
-            // Trouver la position maximale et ajouter 1
-            const maxPosition = Math.max(...existingCards.map(card => card.position || 0));
-            nextPosition = maxPosition + 1;
+            var maxPosition = Math.max(...existingCards.map(card => card.position || 0)); //recupere l'index max des cartes de la colonne pour mettre après
+            nextPosition = maxPosition + 1; 
         }
 
-        const payload = {
-            data: {
-                title: cardData.title,
-                description: cardData.description || "",
-                priority: cardData.priority || "normal",
-                dueDate: cardData.dueDate || null,
-                labels: cardData.labels || null,
-                position: nextPosition,
-                column: columnId,
-                board: boardId
-            }
-        };
 
-        const response = await axios.post(
-            `${API_URL}/api/cards`,
-            payload,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+        // Get current user ID
+        const user = getUserInfoFromStorage();
+        const userId = user ? user.id : null;
+
+        const response = await axios.post(`${API_URL}/api/cards`,{
+                data: {
+                    title: cardData.title,
+                    description: cardData.description || "",
+                    priority: cardData.priority || "normal",
+                    dueDate: cardData.dueDate || null,
+                    labels: cardData.labels || null,
+                    position: nextPosition, 
+                    column: columnId,
+                    board: boardId,
+                    user: userId
                 }
+            },{headers: {"Authorization": `Bearer ${token}`}
             }
         );
 
         return response.data.data;
     } catch (error) {
-        throw error;
+        console.log("Error creating card", error);
+        SendNotification("Error creating card: " + error.message, true, false);
     }
 }
 
 function getCardIdentifier(cardId) {
-    // Si l'ID est un documentId (long string), on l'utilise
-    // Si c'est un ID numérique classique, on essaie les deux
     return cardId;
 }
 
 export async function updateCard(cardId, cardData) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
+        if (!token) {
+            SendNotification("User not authenticated", true, false);
+            return;
+        } 
         const cardIdentifier = getCardIdentifier(cardId);
         
+
+        // permet de mettre a jour seulement les champs dans cardData qui sont définis, et laisse les autres
         const updateData = {};
-        
         if (cardData.title !== undefined) updateData.title = cardData.title;
         if (cardData.description !== undefined) updateData.description = cardData.description;
         if (cardData.priority !== undefined) updateData.priority = cardData.priority;
@@ -68,92 +69,88 @@ export async function updateCard(cardId, cardData) {
         if (cardData.favorite !== undefined) updateData.favorite = cardData.favorite;
         if (cardData.position !== undefined) updateData.position = cardData.position;
         
+
+        //met à jour la colonne lier à la carte, en vérifiant si c'est columnId ou column qui est défini dans cardData
         if (cardData.columnId !== undefined) {
             updateData.column = cardData.columnId;
         } else if (cardData.column !== undefined) {
             updateData.column = cardData.column;
         }
 
-        const response = await axios.put(
-            `${API_URL}/api/cards/${cardIdentifier}`,
+        //on met a jour la carte avec les champs définis dans updateData sur Strapi, en utilisant l'identifiant de la carte
+        const response = await axios.put(`${API_URL}/api/cards/${cardIdentifier}`,
             { data: updateData },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+            { headers: {"Authorization": `Bearer ${token}`
                 }
             }
         );
 
         return response.data.data;
     } catch (error) {
-        throw error;
+        console.log("Error updating card", error);
+        SendNotification("Error updating card: " + error.message, true, false);
     }
 }
 
 export async function moveCard(cardId, targetColumnId, position = 0) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
+        if (!token) {
+            SendNotification("Error while moving card", true, false);
+            return;
+        }
         
         const cardIdentifier = getCardIdentifier(cardId);
+
         const response = await axios.put(
             `${API_URL}/api/cards/${cardIdentifier}`,
-            {
-                data: {
-                    column: targetColumnId,
-                    position: position
-                }
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            }
+            {data: {column: targetColumnId,position: position}},
+            {headers: {"Authorization": `Bearer ${token}`}}
         );
 
         return response.data.data;
     } catch (error) {
-        throw error;
+        SendNotification("Error while moving card", true, false);
+        return;
     }
 }
 
 export async function deleteCard(cardId) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
+        if (!token) {
+            SendNotification("Error while deleting card", true, false);
+            return;
+        };
         const cardIdentifier = getCardIdentifier(cardId);
+
         const response = await axios.delete(
             `${API_URL}/api/cards/${cardIdentifier}`,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            }
+            {headers: {"Authorization": `Bearer ${token}`}}
         );
 
         return response.data;
     } catch (error) {
-        console.error("Error deleting card:", error);
-        throw error;
+        SendNotification("Error while deleting card", true, false);
+        return;
     }
 }
 
 export async function getCardsByColumn(columnId) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("User not authenticated");
+        if (!token) {
+            SendNotification("User not authenticated", true, false);
+            return [];
+        }
 
         const response = await axios.get(`${API_URL}/api/cards?filters[column][id][$eq]=${columnId}`, {
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-        }
+            headers: {"Authorization": `Bearer ${token}` }}
         );
 
         return response.data && response.data.data ? response.data.data : [];
     } catch (error) {
-        console.error("Error fetching cards:", error);
-        throw error;
+        SendNotification("Error fetching cards:", true, false);
+        return [];
     }
 }

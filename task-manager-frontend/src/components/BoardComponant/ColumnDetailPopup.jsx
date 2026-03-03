@@ -49,23 +49,12 @@ export default function ColumnDetailPopup({ column, onClose, onUpdate }) {
                 <div className="flex flex-col gap-3">
                     <div>
                         <label className="block text-text text-sm mb-1">Column Title</label>
-                        <input
-                            type="text"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
-                            className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1"
-                            disabled={isLoading}
-                            placeholder="Column title"
-                            autoFocus
-                        />
+                        <input type="text"value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            onKeyDown={(e) => e.key === 'Enter' && handleUpdate()} className="w-full px-3 py-2 bg-surface text-text rounded outline-none focus:ring-2 focus:ring-accent1"
+                            disabled={isLoading} placeholder="Column title" autoFocus/> 
                     </div>
 
-                    <button
-                        onClick={handleUpdate}
-                        disabled={isLoading}
-                        className="w-full px-4 py-2 bg-accent1 text-white rounded hover:opacity-90 disabled:opacity-50 mt-2"
-                    >
+                    <button onClick={handleUpdate} disabled={isLoading} className="w-full px-4 py-2 bg-accent1 text-white rounded hover:opacity-90 disabled:opacity-50 mt-2">
                         {isLoading ? "Updating..." : "Update Column"}
                     </button>
                 </div>

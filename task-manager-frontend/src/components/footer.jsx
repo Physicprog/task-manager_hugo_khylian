@@ -1,17 +1,7 @@
 import React from 'react';
 
-function scrollToElement(sectionId) {
-    const element = document.getElementById(sectionId);
-    if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-    }
-}
 
-function scrollToElementWithDelay(sectionId) {
-    setTimeout(function() {
-        scrollToElement(sectionId);
-    }, 100);
-}
+
 
 export default function Footer({ WantToAddLink = true, currentView, setView }) {
     function handleSectionClick(e, sectionId) {
@@ -19,14 +9,14 @@ export default function Footer({ WantToAddLink = true, currentView, setView }) {
 
         if (currentView !== "home" && setView) {
             setView("home");
-            scrollToElementWithDelay(sectionId);
         } else {
-            scrollToElement(sectionId);
+            setView("projects");
         }
     }
 
     function handleBackToTop(e) {
         e.preventDefault();
+        //remonte en haut de la page sinon ça bloque à la moitié
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 

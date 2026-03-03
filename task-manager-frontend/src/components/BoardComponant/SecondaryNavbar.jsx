@@ -19,12 +19,9 @@ export default function SecondaryNavbar({ isTemplateMode = false, boardName, sho
                         {isTemplateMode ? "Template board, this board will not be saved!" : boardName}
                     </h1>
                     <div className="flex items-center gap-4">
-                        <img
-                            src={showOnlyFavorites ? fav : nofav}
-                            alt="favorite"
+                        <img src={showOnlyFavorites ? fav : nofav} alt="favorite"
                             className="h-5 w-[1.3rem] cursor-pointer hover:opacity-70 transition"
-                            onClick={() => setShowOnlyFavorites && setShowOnlyFavorites(!showOnlyFavorites)}
-                        />
+                            onClick={() => setShowOnlyFavorites && setShowOnlyFavorites(!showOnlyFavorites)}/>
 
                         <button className="cursor-pointer mt-[0.5rem] hover:opacity-70 transition" onClick={() => setShowHowToUse(true)} aria-label="How to use">
                             <span className="material-symbols-outlined">help</span>

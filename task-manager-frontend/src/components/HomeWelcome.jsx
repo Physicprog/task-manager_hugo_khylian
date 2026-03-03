@@ -45,7 +45,9 @@ export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
                             Scroll to explore
                         </p>
                         <p className="text-4xl text-cyan-100 group-hover:text-white animate-upDown transition-colors">
-                            ↓
+                            <span className="material-symbols-outlined">
+                                arrow_cool_down
+                            </span>
                         </p>
                     </div>
                 </a>

@@ -20,9 +20,9 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
         document.body.classList.remove('theme-light', 'theme-dark');
         document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
         localStorage.setItem('theme', theme);
-    }, [theme]);
+    }, [theme]); //a chaque changement de "theme", on met à jour
 
-    useEffect(() => {
+    useEffect(() => { /*Responsive*/
         function SwipResize() {
             setIsMobile(window.innerWidth < 850);
             if (window.innerWidth >= 850) setOpen(false);
@@ -54,7 +54,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
         setAvatarMenuOpen(!AvatarMenuOpen);
     }
 
-    const isConnected = userInfos?.isConnected || false;
+    const isConnected = userInfos && userInfos.isConnected ? true : false; //avec le ?.
 
     return (
         <>
@@ -65,6 +65,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                             <img src={logo} alt="logo" className="h-[35px] w-auto object-contain select-none hover:animate-hoverScale active:animate-activeScale transition-all duration-200" />
                         </button>
                     </div>
+                    
 
                     {!isMobile && !isTemplateMode && (
                         <div className="flex-1 flex justify-center">

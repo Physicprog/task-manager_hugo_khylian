@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getBoardDetails } from "../services/boardDetailled.js";
-import { createColumn, updateColumn, deleteColumn, getColumnsByBoard } from "../services/columnService.js";
+import { createColumn, updateColumn, deleteColumn, getColumnsByBoard, updateColumnsPositions } from "../services/columnService.js";
 import { createCard, updateCard, deleteCard, moveCard } from "../services/cardService.js";
 import SecondaryNavbar from "./BoardComponant/SecondaryNavbar.jsx";
 import Navbar from "./navbar.jsx";
@@ -61,7 +61,7 @@ async function loadBoardNameFromServer(boardId, setBoardName, navigate) {
             navigate('/error/500');
         }
     } catch (error) {
-        console.error("Error loading board name:", error);
+        console.log("Error loading board name:", error);
         navigate('/error/500');
     }
 }
@@ -113,7 +113,7 @@ async function handleAddColumn(title, isTemplate, boardId, columns, setColumns, 
             SendNotification("Error creating column", true, false);
         }
     } catch (error) {
-        console.error("Error adding column:", error);
+        console.log("Error adding column:", error);
         if (error.response && error.response.status === 401) {
             navigate('/error/401');
         } else if (error.response && error.response.status === 403) {
@@ -153,7 +153,7 @@ async function handleUpdateColumn(columnId, data, columns, setColumns) {
         await updateColumn(columnId, data);
         updateColumnInState(columnId, data, columns, setColumns);
     } catch (error) {
-        console.error("Error updating column:", error);
+        console.log("Error updating column:", error);
         SendNotification("Error updating column", true, false);
     }
 }
@@ -178,7 +178,7 @@ async function handleDeleteColumn(columnId, columns, setColumns) {
         await deleteColumn(columnId);
         removeColumnFromState(columnId, columns, setColumns);
     } catch (error) {
-        console.error("Error deleting column:", error);
+        console.log("Error deleting column:", error);
         SendNotification("Error deleting column", true, false);
     }
 }
@@ -234,9 +234,8 @@ async function handleCreateCard(columnId, cardData, isTemplate, boardId, columns
         await reloadColumns();
         SendNotification("Card created successfully", true, true);
     } catch (error) {
-        console.error("Error creating card:", error);
         SendNotification("Error creating card", true, false);
-        throw error;
+        console.log("Error details:", error.response);
     }
 }
 
@@ -293,9 +292,9 @@ async function handleUpdateCard(cardId, cardData, isTemplate, columns, setColumn
         await updateCard(cardId, cardData);
         await reloadColumns();
     } catch (error) {
-        console.error("Error updating card:", error);
+        console.log("Error updating card:", error);
         SendNotification("Error updating card", true, false);
-        throw error;
+
     }
 }
 
@@ -328,9 +327,8 @@ async function handleDeleteCard(cardId, isTemplate, columns, setColumns, reloadC
         await deleteCard(cardId);
         await reloadColumns();
     } catch (error) {
-        console.error("Error deleting card:", error);
+        console.log("Error deleting card:", error);
         SendNotification("Error deleting card", true, false);
-        throw error;
     }
 }
 
@@ -423,7 +421,7 @@ async function handleToggleFavorite(card, columns, setColumns) {
             position: card.position
         });
     } catch (e) {
-        console.error("Error updating favorite:", e);
+        console.log("Error updating favorite:", e);
         const revertedColumns = [];
         for (let i = 0; i < columns.length; i++) {
             const col = columns[i];
@@ -474,7 +472,7 @@ async function handleMoveCard(cardId, sourceColumnId, targetColumnId, newTargetC
 
         SendNotification("Card moved successfully", true, true);
     } catch (error) {
-        console.error("Error moving card:", error);
+        console.log("Error moving card:", error);
         SendNotification("Error moving card", true, false);
         await reloadColumns();
     }
@@ -498,9 +496,14 @@ async function handleMoveColumn(newColumns, isTemplate, setColumns, reloadColumn
 
     try {
         setColumns(newColumns);
-        SendNotification("Column moved successfully", true, true);
+        const success = await updateColumnsPositions(newColumns);
+        if (success) {
+            SendNotification("Column moved successfully", true, true);
+        } else {
+            SendNotification("Error saving column position", true, false);
+            await reloadColumns();
+        }
     } catch (error) {
-        console.error("Error moving column:", error);
         SendNotification("Error moving column", true, false);
         await reloadColumns();
     }
@@ -585,6 +588,14 @@ export default function DetailledBoards({ isTemplate = false }) {
 
     const displayedColumns = getDisplayedColumns(columns, showOnlyFavorites);
 
+
+
+
+
+
+
+
+    
     function handleLogoutClick() {
         handleLogout(setUser, setUserInfos, navigate);
     }
@@ -669,70 +680,35 @@ export default function DetailledBoards({ isTemplate = false }) {
 
     return (
         <>
-            <Navbar 
-                userInfos={userInfos} 
-                onLogout={handleLogoutClick} 
-                onLoginClick={handleLoginClick} 
-                wantToAddSearch={false} 
-                isTemplateMode={true} 
-                onGoHome={handleGoHomeClick} 
-            />
+            <Navbar userInfos={userInfos} onLogout={handleLogoutClick} onLoginClick={handleLoginClick} 
+                wantToAddSearch={false} isTemplateMode={true} onGoHome={handleGoHomeClick} />
 
-            <SecondaryNavbar 
-                boardName={boardDisplayName} 
-                showOnlyFavorites={showOnlyFavorites} 
-                setShowOnlyFavorites={setShowOnlyFavorites} 
-            />
+            <SecondaryNavbar boardName={boardDisplayName} showOnlyFavorites={showOnlyFavorites} setShowOnlyFavorites={setShowOnlyFavorites} />
 
             <div className="min-h-screen bg-surface flex items-center justify-center">
                 <div className="w-full">
-                    <CardList 
-                        columns={displayedColumns} 
-                        onColumnAdd={handleColumnAddClick} 
-                        onColumnEdit={handleColumnEditClick} 
-                        onColumnDelete={handleColumnDeleteClick} 
-                        onOpenAddCard={handleOpenAddCardClick} 
-                        onCardClick={handleCardClickClick} 
-                        onToggleFavorite={handleToggleFavoriteClick} 
-                        onMoveCard={handleMoveCardClick} 
-                        onMoveColumn={handleMoveColumnClick} 
-                    />
+                    <CardList columns={displayedColumns} onColumnAdd={handleColumnAddClick} onColumnEdit={handleColumnEditClick} onColumnDelete={handleColumnDeleteClick} 
+                        onOpenAddCard={handleOpenAddCardClick} onCardClick={handleCardClickClick} onToggleFavorite={handleToggleFavoriteClick} 
+                        onMoveCard={handleMoveCardClick} onMoveColumn={handleMoveColumnClick} />
                 </div>
             </div>
 
             <Footer WantToAddLink={false} />
 
             {showLogin && 
-                <Login 
-                    onLogin={handleLoginSuccess} 
-                    onClose={handleLoginClose} 
-                />
+                <Login onLogin={handleLoginSuccess} onClose={handleLoginClose} />
             }
 
             {showColumnPopup && selectedColumn && 
-                <ColumnDetailPopup 
-                    column={selectedColumn} 
-                    onClose={handleCloseColumnPopup} 
-                    onUpdate={handleColumnUpdate} 
-                />
+                <ColumnDetailPopup column={selectedColumn} onClose={handleCloseColumnPopup} onUpdate={handleColumnUpdate} />
             }
 
             {showCardCreatePopup && selectedColumnForCard && 
-                <CardCreatePopup 
-                    column={selectedColumnForCard} 
-                    onClose={handleCloseCardCreatePopup} 
-                    onCreate={handleCreateCardClick} 
-                />
+                <CardCreatePopup column={selectedColumnForCard} onClose={handleCloseCardCreatePopup} onCreate={handleCreateCardClick} />
             }
 
             {showCardDetailPopup && selectedCard && 
-                <CardDetailPopup 
-                    card={selectedCard} 
-                    column={selectedColumn} 
-                    onClose={handleCloseCardDetailPopup} 
-                    onUpdate={handleCardUpdate} 
-                    onDelete={handleCardDelete} 
-                />
+                <CardDetailPopup card={selectedCard} column={selectedColumn} onClose={handleCloseCardDetailPopup} onUpdate={handleCardUpdate} onDelete={handleCardDelete} />
             }
         </>
     );
@@ -764,7 +740,6 @@ async function loadColumnsData(boardId, setColumns, navigate) {
             navigate('/error/500');
         }
     } catch (error) {
-        console.error("Error reloading columns:", error);
         navigate('/error/500');
     }
 }

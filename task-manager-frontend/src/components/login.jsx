@@ -13,10 +13,6 @@ function createEmptyFormData() {
     };
 }
 
-function validateEmail(email) {
-    return email && email.includes("@") && email.includes(".");
-}
-
 function validatePassword(password, isRegisterMode) {
     if (isRegisterMode && password.length < 6) {
         return false;
@@ -74,11 +70,7 @@ export default function Login({ onClose, onLogin }) {
     }
 
     function checkRegistrationFields(email, password, confirmPassword) {
-        if (!validateEmail(email)) {
-            SendNotification("Email required for registration", true, false);
-            return false;
-        }
-        
+       
         if (!validatePasswordsMatch(password, confirmPassword, true)) {
             SendNotification("Passwords do not match", true, false);
             return false;
@@ -113,11 +105,11 @@ export default function Login({ onClose, onLogin }) {
             password: formData.password,
             gender: formData.gender
         });
-        SendNotification("Registration successful! Welcome!", true, true);
+        SendNotification("Registration successful!", true, true);
         return result;
     }
 
-    async function performLogin() {
+    async function performLogin() { /*pour le login, on a juste besoin du username et du password, pas de email ni de gender*/
         const result = await login({
             identifier: formData.username,
             password: formData.password
@@ -219,17 +211,17 @@ export default function Login({ onClose, onLogin }) {
 
                 <form className="flex flex-col gap-4" onSubmit={handleFormSubmit}>
                     <input type="text" placeholder="Username" value={formData.username} onChange={function(e) { updateFormField('username', e.target.value); }}
-                        className="w-full p-3 border border-gray-300 rounded-lg text-black" disabled={isLoading} required />
+                        className="w-full p-3 border border-gray-300 rounded-lg text-black" disabled={isLoading} required autoComplete="username" />
 
                     {isRegisterMode && (
-                        <input type="email" placeholder="Email" value={formData.email} onChange={function(e) { updateFormField('email', e.target.value); }} className="w-full p-3 border border-gray-300 text-black rounded-lg" disabled={isLoading} required />
+                        <input type="email" placeholder="Email" value={formData.email} onChange={function(e) { updateFormField('email', e.target.value); }} className="w-full p-3 border border-gray-300 text-black rounded-lg" disabled={isLoading} required autoComplete="email" />
                     )}
 
-                    <input type={getPasswordInputType()} id="GetPW1" placeholder="Password" value={formData.password} onChange={function(e) { updateFormField('password', e.target.value); }} className="w-full p-3 border border-gray-300 text-black rounded-lg" disabled={isLoading} required minLength={6} />
+                    <input type={getPasswordInputType()} id="GetPW1" placeholder="Password" value={formData.password} onChange={function(e) { updateFormField('password', e.target.value); }} className="w-full p-3 border border-gray-300 text-black rounded-lg" disabled={isLoading} required minLength={6} autoComplete="current-password" />
 
                     {isRegisterMode && (
                         <input type={getPasswordInputType()} id="GetPW2" placeholder="Confirm Password" value={formData.confirmPassword} onChange={function(e) { updateFormField('confirmPassword', e.target.value); }} className="w-full p-3 border border-gray-300 text-black rounded-lg"
-                            disabled={isLoading} required minLength={6} />
+                            disabled={isLoading} required minLength={6} autoComplete="new-password" />
                     )}
 
                     {isRegisterMode && (

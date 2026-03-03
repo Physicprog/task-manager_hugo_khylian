@@ -17,12 +17,11 @@ export default function NewBoardSettings({ onClose, onOpen, onBoardNotFound, edi
                 endDate: boardToEdit.endDate || ""
             };
             setFormData(newFormData);
-        }
-    }, [editMode, boardToEdit]);
+        }}, [editMode, boardToEdit]); //executera à nouveaux si editMode ou boardToEdit change 
 
     function updateField(field, value) {
         setFormData(prevData => ({
-            ...prevData,
+            ...prevData, //le ... permet de modifier seulement le champ ciblé et de garder les autres inchangés
             [field]: value
         }));
     }
@@ -92,13 +91,13 @@ export default function NewBoardSettings({ onClose, onOpen, onBoardNotFound, edi
                     <textarea placeholder="Board description" value={formData.description} onChange={e => updateField("description", e.target.value)} className="p-2 rounded text-black border-2 border-gray-300 focus:border-accent1 outline-none transition resize-none" disabled={isLoading} maxLength={500} rows={3} />
 
                     <select value={formData.label} onChange={e => updateField("label", e.target.value)} className="p-2 rounded text-black border-2 border-gray-300 focus:border-accent1 outline-none transition" disabled={isLoading}>
-                        <option value="Red" className="bg-red-400">Red</option>
-                        <option value="Blue" className="bg-blue-400">Blue</option>
-                        <option value="Green" className="bg-green-400">Green</option>
-                        <option value="Yellow" className="bg-yellow-400">Yellow</option>
-                        <option value="Purple" className="bg-purple-400">Purple</option>
-                        <option value="Orange" className="bg-orange-400">Orange</option>
-                        <option value="Pink" className="bg-pink-400">Pink</option>
+                        <option value="Red" className="bg-red-300">Red</option>
+                        <option value="Blue" className="bg-blue-300">Blue</option>
+                        <option value="Green" className="bg-green-300">Green</option>
+                        <option value="Yellow" className="bg-yellow-300">Yellow</option>
+                        <option value="Purple" className="bg-purple-300">Purple</option>
+                        <option value="Orange" className="bg-orange-300">Orange</option>
+                        <option value="Pink" className="bg-pink-300">Pink</option>
                     </select>
 
                     <div className="flex flex-col gap-1">

@@ -37,6 +37,8 @@
     opacity: 100%;
 }
 
+
+
 /* utility classes pour les accents car Tailwind voulait pas les prendres*/
 @layer utilities {
     .bg-accent1 {
@@ -140,8 +142,48 @@ strong {
 }
 
 
-.hide-scrollbar {
-    scrollbar-color: var(--color-accent-main) transparent;
+.horizontal-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+        scrollbar-color: var(--color-accent-main) transparent;
     scrollbar-width: thin; 
 }
 
+
+
+@keyframes waviy {
+
+    0%,
+    8%,
+    100% {
+        transform: translateY(0);
+        text-decoration: none;
+    }
+
+    4% {
+        transform: translateY(-2vh);
+        color: rgb(118, 97, 255);
+        text-shadow: 0px 0px 2vw #6f00ff57;
+        text-decoration: underline;
+    }
+}
+
+.animate-waviy {
+    animation: waviy 6s infinite;
+}
+
+.delay-0 { animation-delay: 0s; }
+.delay-1 { animation-delay: 0.075s; }
+.delay-2 { animation-delay: 0.15s; }
+
+
+
+
+.drag-active * { 
+  user-select: none !important;
+}
+
+.placeholder-card, .placeholder-column {
+  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.1);
+}

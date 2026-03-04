@@ -16,7 +16,7 @@ function createEmptyFormData() {
 function validatePassword(password, isRegisterMode) {
     if (isRegisterMode && password.length < 6) {
         return false;
-    }xwcsdfvdc
+    }
     return true;
 }
 

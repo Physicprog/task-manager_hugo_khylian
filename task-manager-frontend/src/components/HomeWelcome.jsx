@@ -1,10 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import HowToUsePanel from "./BoardComponant/HowToUsePanel.jsx";
 
 const landscape = '/landscapeMontain.webp';
 
 export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
     const navigate = useNavigate();
+    const [showHowToUse, setShowHowToUse] = useState(false);
+
+    function closeHowToUse() {
+        setShowHowToUse(false);
+    }
 
     function goToTemplateBoard() {
         navigate("/template-board");
@@ -153,9 +159,14 @@ export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
 
             <main id="HowItWorks" className="py-20 px-6 bg-cardBg/30">
                 <div className="max-w-5xl mx-auto">
-                    <h2 data-aos="fade-up" className="text-4xl md:text-5xl font-bold text-center text-text mb-4">
-                        How It Works
-                    </h2>
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <h2 data-aos="fade-up" className="text-4xl md:text-5xl font-bold text-text">
+                            How It Works
+                        </h2>
+                        <button className="cursor-pointer p-2 hover:bg-accent1/20 rounded-lg hover:opacity-70 transition-all duration-200 flex items-center justify-center" onClick={() => setShowHowToUse(true)} >
+                            <span className="material-symbols-outlined text-5xl text-text">help</span>
+                        </button>
+                    </div>
                     <p data-aos="fade-up" data-aos-delay="200" className="text-center text-gray-400 text-lg mb-16 max-w-2xl mx-auto">
                         Get started in seconds. Here's how to make the most of Task Manager.
                     </p>
@@ -340,6 +351,10 @@ export default function HomeWelcome({ userInfos, onNewBoardClick, setView }) {
                         </div>
                     </div>
                 </section>
+            )}
+
+            {showHowToUse && (
+                <HowToUsePanel onClose={closeHowToUse} />
             )}
 
         </>

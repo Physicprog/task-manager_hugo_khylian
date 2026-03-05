@@ -2,14 +2,20 @@ import axios from "axios";
 import { SendNotification } from "../utils/notifs";
 import  { API_URL } from "./authService.js";
 
+function checkAuthentication() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        SendNotification("User not authenticated", true, false);
+        return null;
+    }
+    return token;
+}
+
 
 export async function createColumn(boardId, title) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return;
-        }
+        const token = checkAuthentication();
+        if (!token) return;
 
         const response = await axios.post(`${API_URL}/api/columns`,
             { data: { name: title, board: boardId, position: 0} },
@@ -24,11 +30,8 @@ export async function createColumn(boardId, title) {
 
 export async function updateColumn(columnId, data) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return;
-        }
+        const token = checkAuthentication();
+        if (!token) return;
 
         const response = await axios.put(`${API_URL}/api/columns/${columnId}`,
             {data: {name: data.title}},{headers: {"Authorization": `Bearer ${token}`}}
@@ -42,11 +45,8 @@ export async function updateColumn(columnId, data) {
 
 export async function updateColumnsPositions(columns) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return;
-        }
+        const token = checkAuthentication();
+        if (!token) return;
 
         const promises = [];
         for (let i = 0; i < columns.length; i++) {
@@ -67,7 +67,8 @@ export async function updateColumnsPositions(columns) {
 
 export async function deleteColumn(columnId) {
     try {
-        const token = localStorage.getItem("token");
+        const token = checkAuthentication();
+        if (!token) return;
         const response = await axios.delete(`${API_URL}/api/columns/${columnId}`,{headers: {"Authorization": `Bearer ${token}`}});
         return response.data;
     } catch (error) {
@@ -79,10 +80,8 @@ export async function deleteColumn(columnId) {
 
 export async function getColumnsByBoard(boardId) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            return null;
-        }
+        const token = checkAuthentication();
+        if (!token) return null;
         //on recupere directement les colonnes du board (filtre par board) et on les trie pour les afficher dans l'ordre
         const response = await axios.get(
             `${API_URL}/api/columns?populate[0]=board&sort=position:asc`,

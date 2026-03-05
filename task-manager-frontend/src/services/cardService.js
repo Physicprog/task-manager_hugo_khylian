@@ -2,13 +2,19 @@ import axios from "axios";
 import  { API_URL, getUserInfoFromStorage } from "./authService.js";
 import { SendNotification } from "../utils/notifs.js";
 
+function checkAuthentication() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        SendNotification("User not authenticated", true, false);
+        return null;
+    }
+    return token;
+}
+
 export async function createCard(columnId, boardId, cardData) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return;
-        }
+        const token = checkAuthentication();
+        if (!token) return;
         const existingCards = await getCardsByColumn(columnId);
         let nextPosition = 0;
         
@@ -18,7 +24,6 @@ export async function createCard(columnId, boardId, cardData) {
         }
 
 
-        // Get current user ID
         const user = getUserInfoFromStorage();
         const userId = user ? user.id : null;
 
@@ -40,7 +45,6 @@ export async function createCard(columnId, boardId, cardData) {
 
         return response.data.data;
     } catch (error) {
-        console.log("Error creating card", error);
         SendNotification("Error creating card: " + error.message, true, false);
     }
 }
@@ -51,11 +55,8 @@ function getCardIdentifier(cardId) {
 
 export async function updateCard(cardId, cardData) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return;
-        } 
+        const token = checkAuthentication();
+        if (!token) return; 
         const cardIdentifier = getCardIdentifier(cardId);
         
 
@@ -87,18 +88,14 @@ export async function updateCard(cardId, cardData) {
 
         return response.data.data;
     } catch (error) {
-        console.log("Error updating card", error);
         SendNotification("Error updating card: " + error.message, true, false);
     }
 }
 
 export async function moveCard(cardId, targetColumnId, position = 0) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("Error while moving card", true, false);
-            return;
-        }
+        const token = checkAuthentication();
+        if (!token) return;
         
         const cardIdentifier = getCardIdentifier(cardId);
 
@@ -117,11 +114,8 @@ export async function moveCard(cardId, targetColumnId, position = 0) {
 
 export async function deleteCard(cardId) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("Error while deleting card", true, false);
-            return;
-        };
+        const token = checkAuthentication();
+        if (!token) return;
         const cardIdentifier = getCardIdentifier(cardId);
 
         const response = await axios.delete(
@@ -138,11 +132,8 @@ export async function deleteCard(cardId) {
 
 export async function getCardsByColumn(columnId) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return [];
-        }
+        const token = checkAuthentication();
+        if (!token) return [];
 
         const response = await axios.get(`${API_URL}/api/cards?filters[column][id][$eq]=${columnId}`, {
             headers: {"Authorization": `Bearer ${token}` }}

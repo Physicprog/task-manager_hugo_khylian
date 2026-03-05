@@ -14,10 +14,10 @@ function createEmptyFormData() {
 }
 
 function validatePassword(password, isRegisterMode) {
-    if (isRegisterMode && password.length < 6) {
+    if (isRegisterMode && (!password || password.length < 6)) {
         return false;
     }
-    return true;
+    return password && password.length > 0;
 }
 
 function validatePasswordsMatch(password, confirmPassword, isRegisterMode) {
@@ -81,6 +81,38 @@ export default function Login({ onClose, onLogin }) {
             return false;
         }
         
+        return true;
+    }
+
+    function checkRequiredFields(username, password) {
+        if (!username || username.trim().length === 0) {
+            SendNotification("Username is required", true, false);
+            return false;
+        }
+        if (!password || password.length === 0) {
+            SendNotification("Password is required", true, false);
+            return false;
+        }
+        return true;
+    }
+
+    function checkRegistrationFields(email, password, confirmPassword) {
+        if (!email || email.trim().length === 0) {
+            SendNotification("Email is required", true, false);
+            return false;
+        }
+        if (!email.includes("@") || !email.includes(".")) {
+            SendNotification("Please enter a valid email address", true, false);
+            return false;
+        }
+        if (!validatePassword(password, true)) {
+            SendNotification("Password must be at least 6 characters long", true, false);
+            return false;
+        }
+        if (!validatePasswordsMatch(password, confirmPassword, true)) {
+            SendNotification("Passwords do not match", true, false);
+            return false;
+        }
         return true;
     }
 

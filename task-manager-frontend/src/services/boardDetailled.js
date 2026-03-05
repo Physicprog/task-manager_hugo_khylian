@@ -1,13 +1,25 @@
 
 import axios from "axios";
 import  { API_URL }  from "./authService.js";
+import { SendNotification } from "../utils/notifs.js";
+
+function getToken() {
+    return localStorage.getItem("token");
+}
+
+function checkAuthentication() {
+    const token = getToken();
+    if (!token) {
+        SendNotification("User not authenticated", true, false);
+        return null;
+    }
+    return token;
+}
 
 export async function getBoardDetails(boardId, paramToReturn) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            return null;
-        }
+        const token = getToken();
+        if (!token) return null;
 
         const response = await axios.get(
             `${API_URL}/api/boards/${boardId}?populate[columns][populate]=*&populate[cards][populate]=*`,
@@ -50,11 +62,8 @@ export async function getBoardDetails(boardId, paramToReturn) {
 
 export default async function createBoard(title) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return;
-        }
+        const token = checkAuthentication();
+        if (!token) return;
         const response = await axios.post(`${API_URL}/api/boards`, { title }, {
             headers: { "Authorization": `Bearer ${token}` }
         });
@@ -62,6 +71,6 @@ export default async function createBoard(title) {
         return response.data.data;
     }
     catch (error) {
-        console.log("Error creating board", error);
+        SendNotification('Error while creating board', true, false)
     }
 }

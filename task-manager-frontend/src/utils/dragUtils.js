@@ -17,8 +17,8 @@ export function useDragScroll() {
         }
 
         setIsDragging(true);
-        setStartX(e.pageX - scrollContainerRef.current.offsetLeft); // Position de la souris par rapport au conteneur
-        setScrollLeft(scrollContainerRef.current.scrollLeft); // Position du scroll actuelle 
+        setStartX(e.pageX - scrollContainerRef.current.offsetLeft); //  la souris par rapport au conteneur
+        setScrollLeft(scrollContainerRef.current.scrollLeft); // le scroll actuelle 
     }
 
     function handleMouseMove(e) {

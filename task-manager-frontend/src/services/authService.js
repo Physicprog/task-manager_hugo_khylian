@@ -26,7 +26,7 @@ export async function updateUserProfile(token, userData) {
         const response = await axios.put(API_URL + "/api/users/me", userData, { headers });
         return response.data;
     } catch (error) {
-        console.log("Error updating user profile", error);
+        SendNotification("Error while creating user profile", true, false)
     }
 }
 
@@ -48,27 +48,24 @@ async function updateUserGenderProfile(jwt, gender) {
         try {
             await updateUserProfile(jwt, { gender: gender });
         } catch (updateError) {
-            // Ignore update errors for now
+            console.log(error)
         }
     }
 }
 
 function handleRegistrationError(error) {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) { //on recupere l'erreur de strapi
         const errorMessage = error.response.data.error.message;
         
-        // Gestion spécifique pour les erreurs courantes
-        if (errorMessage.toLowerCase().includes("username") && errorMessage.toLowerCase().includes("already")) {
+        if (errorMessage.toLowerCase().includes("username")) {
             SendNotification("This username is already taken. Please choose another one.", true, false);
-        } else if (errorMessage.toLowerCase().includes("email") && errorMessage.toLowerCase().includes("already")) {
+        } else if (errorMessage.toLowerCase().includes("email")) {
             SendNotification("This email is already registered. Please use another email or try logging in.", true, false);
         } else {
             SendNotification(errorMessage, true, false);
         }
-    } else if (error.code === "ERR_NETWORK" || error.code === "ECONNREFUSED") {
-        SendNotification("Server unavailable or network error, please try again later.", true, false);
     } else {
-        SendNotification("An error occurred during registration.", true, false);
+        SendNotification("Error during registration", true, false);
     }
 }
 
@@ -85,7 +82,6 @@ export async function register(data) {
         return { data: response.data, user: user };
     } catch (error) {
         handleRegistrationError(error);
-        console.log("Registration error", error);
     }
 }
 
@@ -163,7 +159,6 @@ export async function getUserProfile(token) {
 
         return user;
     } catch (error) {
-        console.log("Error fetching user profile", error);
         return null;
     }
 }

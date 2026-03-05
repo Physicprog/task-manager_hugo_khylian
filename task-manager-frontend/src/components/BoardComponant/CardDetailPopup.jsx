@@ -58,7 +58,6 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
             });
             SwipClose();
         } catch (error) {
-            console.log('Error updating card:', error);
             SendNotification("Error updating card", true, false);
         } finally {
             setIsLoading(false);
@@ -83,7 +82,6 @@ export default function CardDetailPopup({ card, column, onClose, onUpdate, onDel
             await onDelete(card.id);
             SwipClose();
         } catch (error) {
-            console.log('Error deleting card:', error);
             SendNotification("Error deleting card", true, false);
         } finally {
             setIsLoading(false);

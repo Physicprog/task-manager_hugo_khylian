@@ -61,7 +61,6 @@ async function loadBoardNameFromServer(boardId, setBoardName, navigate) {
             navigate('/error/500');
         }
     } catch (error) {
-        console.log("Error loading board name:", error);
         navigate('/error/500');
     }
 }
@@ -113,7 +112,6 @@ async function handleAddColumn(title, isTemplate, boardId, columns, setColumns, 
             SendNotification("Error creating column", true, false);
         }
     } catch (error) {
-        console.log("Error adding column:", error);
         if (error.response && error.response.status === 401) {
             navigate('/error/401');
         } else if (error.response && error.response.status === 403) {
@@ -153,7 +151,6 @@ async function handleUpdateColumn(columnId, data, columns, setColumns) {
         await updateColumn(columnId, data);
         updateColumnInState(columnId, data, columns, setColumns);
     } catch (error) {
-        console.log("Error updating column:", error);
         SendNotification("Error updating column", true, false);
     }
 }
@@ -178,7 +175,6 @@ async function handleDeleteColumn(columnId, columns, setColumns) {
         await deleteColumn(columnId);
         removeColumnFromState(columnId, columns, setColumns);
     } catch (error) {
-        console.log("Error deleting column:", error);
         SendNotification("Error deleting column", true, false);
     }
 }
@@ -235,7 +231,6 @@ async function handleCreateCard(columnId, cardData, isTemplate, boardId, columns
         SendNotification("Card created successfully", true, true);
     } catch (error) {
         SendNotification("Error creating card", true, false);
-        console.log("Error details:", error.response);
     }
 }
 
@@ -292,7 +287,6 @@ async function handleUpdateCard(cardId, cardData, isTemplate, columns, setColumn
         await updateCard(cardId, cardData);
         await reloadColumns();
     } catch (error) {
-        console.log("Error updating card:", error);
         SendNotification("Error updating card", true, false);
 
     }
@@ -327,7 +321,6 @@ async function handleDeleteCard(cardId, isTemplate, columns, setColumns, reloadC
         await deleteCard(cardId);
         await reloadColumns();
     } catch (error) {
-        console.log("Error deleting card:", error);
         SendNotification("Error deleting card", true, false);
     }
 }
@@ -421,7 +414,6 @@ async function handleToggleFavorite(card, columns, setColumns) {
             position: card.position
         });
     } catch (e) {
-        console.log("Error updating favorite:", e);
         const revertedColumns = [];
         for (let i = 0; i < columns.length; i++) {
             const col = columns[i];
@@ -472,7 +464,6 @@ async function handleMoveCard(cardId, sourceColumnId, targetColumnId, newTargetC
 
         SendNotification("Card moved successfully", true, true);
     } catch (error) {
-        console.log("Error moving card:", error);
         SendNotification("Error moving card", true, false);
         await reloadColumns();
     }

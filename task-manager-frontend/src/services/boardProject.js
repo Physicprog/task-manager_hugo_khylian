@@ -2,6 +2,19 @@ import axios from "axios";
 import { SendNotification } from "../utils/notifs.js";
 import { API_URL, getUserInfoFromStorage } from "./authService.js";
 
+function getToken() {
+    return localStorage.getItem("token");
+}
+
+function checkAuthentication() {
+    const token = getToken();
+    if (!token) {
+        SendNotification("User not authenticated", true, false);
+        return null;
+    }
+    return token;
+}
+
 //deconnecte l'utilisateur et refresh la page
 function handleAuthError() {
     localStorage.removeItem("token");
@@ -12,7 +25,7 @@ function handleAuthError() {
 
 export async function getUserBoardCount() {
     try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
         const user = getUserInfoFromStorage();
 
         if (!token || !user || !user.id) {
@@ -30,11 +43,10 @@ export async function getUserBoardCount() {
 
 export async function getUserBoardProjects() {
     try {
-        const token = localStorage.getItem("token");
+        const token = checkAuthentication();
         const user = getUserInfoFromStorage();
 
         if (!token) {
-            SendNotification("No token found, please login", true, false);
             return [];
         }
 
@@ -50,7 +62,6 @@ export async function getUserBoardProjects() {
 
         return res.data && res.data.data ? res.data.data : [];
     } catch (error) {
-        // si le compte est 401 (token supprimer, utilisateur banni etc...), on deconnecte l'utilisateur
         if (error.response?.status === 401) {
             handleAuthError();
             return [];
@@ -63,11 +74,8 @@ export async function getUserBoardProjects() {
 
 export async function deleteBoard(boardId) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return;
-        }
+        const token = checkAuthentication();
+        if (!token) return;
 
         const response = await axios.delete(`${API_URL}/api/boards/${boardId}`, {
             headers: {"Authorization": `Bearer ${token}`}
@@ -88,11 +96,8 @@ export async function deleteBoard(boardId) {
 
 export async function CreateNewRawBoard({ title, description, label, endDate }) {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            SendNotification("User not authenticated", true, false);
-            return;
-        }
+        const token = checkAuthentication();
+        if (!token) return;
 
         const user = getUserFromLocalStorage();
         if (!user || !user.id) {
@@ -137,7 +142,7 @@ export async function CreateNewRawBoard({ title, description, label, endDate }) 
 
 export async function updateBoard(boardId, data) {
     try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
         const idToUse = boardId;
 
         const endDateToSend = data.endDate === "" ? null : data.endDate;
@@ -153,7 +158,6 @@ export async function updateBoard(boardId, data) {
         } else {
             SendNotification("Error updating board: ", true, false);
         }
-        console.log("Error updating board", error);
     }
 }
 

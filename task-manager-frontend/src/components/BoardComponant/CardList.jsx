@@ -110,7 +110,6 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
 
         try {
             if (activeData.type === "Column" && onMoveColumn) { //si on déplace une colonne
-                // Vérifier si on drop sur une autre colonne ou dans le container
                 const isValidDrop = !overData || overData.type === "Column";
                 
                 if (isValidDrop) {
@@ -124,7 +123,7 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
                     }
 
                     if (activeIndex !== -1) {
-                        // Si on ne trouve pas l'overIndex, on met à la fin
+                        //si on ne trouve pas l'overIndex, on met à la fin
                         if (overIndex === -1) {
                             overIndex = columns.length - 1;
                         }

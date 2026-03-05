@@ -76,8 +76,7 @@ export default function Card({ card, onClick, onToggleFavorite }) {
                 const label = card.labels[i];
                 const labelColor = labelColors[label] || '#888';
                 labelElements.push(
-                    <div key={i} className="px-2 py-0.5 rounded text-white text-xs font-medium" style={{ backgroundColor: labelColor }}>
-                        {label}
+                    <div key={i} className="px-[10vh] py-1 rounded text-white text-xs font-medium" style={{ backgroundColor: labelColor }}>
                     </div>
                 );
             }

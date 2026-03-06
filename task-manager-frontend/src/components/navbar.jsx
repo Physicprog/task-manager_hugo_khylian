@@ -8,7 +8,9 @@ const close = '/Close.png';
 
 export default function Navbar({ userInfos, onLogout, onLoginClick, setView, currentView, onSearch, searchQuery,
     wantToAddSearch = true, isTemplateMode = false, onGoHome }) {
+
     const navigate = useNavigate();
+
     const [isMobile, setIsMobile] = useState(window.innerWidth < 850);
     const [open, setOpen] = useState(false);
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
@@ -22,7 +24,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
         localStorage.setItem('theme', theme);
     }, [theme]); //a chaque changement de "theme", on met à jour
 
-    useEffect(() => { /*Responsive*/
+    useEffect(() => {
         function SwipResize() {
             setIsMobile(window.innerWidth < 850);
             if (window.innerWidth >= 850) setOpen(false);
@@ -54,7 +56,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
         setAvatarMenuOpen(!AvatarMenuOpen);
     }
 
-    const isConnected = userInfos && userInfos.isConnected ? true : false; //avec le ?.
+    const isConnected = userInfos && userInfos.isConnected ? true : false; 
 
     return (
         <>
@@ -96,9 +98,9 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                             ) : (
                                 <>
                                     <span className="text-text text-sm">{userInfos.username}</span>
-                                    <button onClick={ToogleShowMenu} className="w-10 h-10 rounded-full overflow-hidden border-2 border-text p-[2px]">
+                                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-text p-[2px]">
                                         <img src={userInfos.avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-text" />
-                                    </button>
+                                    </div>
                                     <button onClick={onLogout} className="px-3 py-2 bg-red-500 text-white border-2 border-text rounded-lg text-sm">Logout</button>
                                 </>
                             )}

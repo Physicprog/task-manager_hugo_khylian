@@ -1,6 +1,5 @@
-
 import axios from "axios";
-import  { API_URL }  from "./authService.js";
+import { API_URL } from "./authService.js";
 import { SendNotification } from "../utils/notifs.js";
 
 function getToken() {
@@ -21,15 +20,32 @@ export async function getBoardDetails(boardId, paramToReturn) {
         const token = getToken();
         if (!token) return null;
 
+        const meResponse = await axios.get(`${API_URL}/api/users/me`, { //on recupere l'username 
+            headers: { "Authorization": `Bearer ${token}` }});
+
+        const currentUserId = meResponse.data && meResponse.data.id;
+
         const response = await axios.get(
-            `${API_URL}/api/boards/${boardId}?populate[columns][populate]=*&populate[cards][populate]=*`,
-            {headers: {"Authorization": `Bearer ${token}`}}
+            `${API_URL}/api/boards/${boardId}?populate=*`,
+            { headers: { "Authorization": `Bearer ${token}` } }
         );
 
-        const board = response.data?.data;
+        const board = response.data && response.data.data;
 
         if (!board) {
             return "Board not found";
+        }
+
+        let boardOwnerId = null;
+      
+        if (board.user && board.user.id) //si l'id d'un board colle avec l'id de l'user alors on skip sinon on bascule sur une erreur juste après
+            boardOwnerId = board.user.id; 
+
+        
+
+        if (boardOwnerId !== null && boardOwnerId !== currentUserId) {
+            SendNotification("Access denied: this board does not belong to you.", true, false);
+            return "forbidden";
         }
 
         if (paramToReturn === "boardName") {
@@ -37,28 +53,18 @@ export async function getBoardDetails(boardId, paramToReturn) {
         }
 
         if (paramToReturn === "columns") {
-            return board.columns?.data || board.columns || [];
+            return (board.columns && board.columns.data) || board.columns || [];
         }
 
         if (paramToReturn === "cards") {
-            return board.cards?.data || board.cards || [];
+            return (board.cards && board.cards.data) || board.cards || [];
         }
 
         return board;
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 404) {
-                return "Board not found";
-            }
-            if (error.response.status === 401 || error.response.status === 403) {
-                return null;
-            }
-        }
-        
-        return "Server error";
+        SendNotification( "Server error", true, false);
     }
 }
-
 
 export default async function createBoard(title) {
     try {
@@ -69,8 +75,7 @@ export default async function createBoard(title) {
         });
 
         return response.data.data;
-    }
-    catch (error) {
-        SendNotification('Error while creating board', true, false)
+    } catch (error) {
+        SendNotification('Error while creating board', true, false);
     }
 }

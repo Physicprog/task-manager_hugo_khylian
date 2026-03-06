@@ -41,7 +41,7 @@ export default function Login({ onClose, onLogin }) {
     function updateFormField(field, value) {
         setFormData(function(prev) {
             return {
-                ...prev,
+                ...prev, 
                 [field]: value
             };
         });

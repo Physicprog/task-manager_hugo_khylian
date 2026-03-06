@@ -3,9 +3,7 @@ import { SendNotification } from "../../utils/notifs.js";
 const Close = "/Close.png";
 
 export default function ColumnDetailPopup({ column, onClose, onUpdate }) {
-    const [formData, setFormData] = useState({
-        title: column?.title || ""
-    });
+    const [formData, setFormData] = useState({title: column?.title || ""});
     const [isLoading, setIsLoading] = useState(false);
     const [closing, setClosing] = useState(false);
 

@@ -47,6 +47,10 @@ async function loadBoardNameFromServer(boardId, setBoardName, navigate) {
             navigate('/error/401');
             return;
         }
+        if (name === "forbidden") {
+            navigate('/error/403');
+            return;
+        }
         if (name === "Board not found") {
             navigate('/error/404');
             return;

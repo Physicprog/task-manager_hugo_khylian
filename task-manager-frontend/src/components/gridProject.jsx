@@ -42,9 +42,10 @@ function closeMenusAndPopups(setOpenMenuId, setShowModifyPopup, setSelectedItem)
 function setupClickOutsideListener(openMenuId, setOpenMenuId) {
     function handleClickOutside(event) {
         if (openMenuId !== null) {
-            const menuContainer = event.target.closest('.menu-container');
+            const menuContainer = event.target.closest('.menu-container');  //on prend une marge sur les card pour cliquer dessus
             if (!menuContainer) {
                 setOpenMenuId(null);
+
             }
         }
     }
@@ -188,11 +189,11 @@ export default function CardGrid({ items = [], onDelete, onBoardDeleted, onBoard
         <>
             <div className={`flex gap-4 ${isMobile ? "flex-col" : "flex-row flex-wrap"}`}>
                 {items.length === 0 ? (
-                    <div className="w-full text-center text-gray-light py-8">
+                    <div className="w-full text-center text-gray-light py-8 ">
                         No boards yet. Create your first board!
                     </div>
                 ) : (
-                    items.map(function(item) {
+                    items.map(function(item) { //on bouble pour toutes les cards donner en parametre
                         const label = item.label ? item.label.toLowerCase() : '';
                         const isMenuOpen = isMenuOpenForItem(item);
                         const cardClasses = `relative cursor-pointer h-44 rounded-lg overflow-hidden shadow-buttonLight hover:shadow-buttonDark transition bg-white dark:bg-gray-800`;

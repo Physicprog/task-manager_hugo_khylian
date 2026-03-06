@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 
 export function useDragScroll() {
-    const scrollContainerRef = useRef(null);
+    const scrollContainerRef = useRef(null); //permet de scroll en referençant le composant sans reload
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);

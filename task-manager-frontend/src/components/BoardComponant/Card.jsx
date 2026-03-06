@@ -49,10 +49,7 @@ export default function Card({ card, onClick, onToggleFavorite }) {
 
     const sortable = useSortable({
         id: cardId,
-        data: {
-            type: "Card",
-            card: card,
-        }
+        data: {type: "Card",card: card,}
     });
 
     const style = {

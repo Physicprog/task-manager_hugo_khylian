@@ -39,7 +39,7 @@ function ErrorPage({ errorType = "404" }) {
         navigate('/');
     }
 
-    function getErrorContent(errorType) {
+    function getErrorContent(params) {
         switch (errorType) {
             case "404":
                 return {

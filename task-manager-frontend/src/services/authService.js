@@ -92,27 +92,6 @@ function createLoginData(data) {
     };
 }
 
-async function getUserGender(jwt, user) {
-    let gender = "other";
-    
-    try {
-        if (jwt) {
-            const profile = await getUserProfile(jwt);
-            if (profile.gender) {
-                gender = profile.gender;
-                user = profile;
-            } else {
-                gender = getGenderFromStorage();
-            }
-        }
-    } catch (error) {
-        gender = getGenderFromStorage();
-        user.gender = gender;
-    }
-    
-    return { user, gender };
-}
-
 function handleLoginError(error) {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
         SendNotification(error.response.data.error.message, true, false);
@@ -137,6 +116,45 @@ export async function login(data) {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function getUserGender(jwt, user) {
+    let gender = "other";
+    
+    try {
+        if (jwt) {
+            const profile = await getUserProfile(jwt);
+            if (profile.gender) {
+                gender = profile.gender;
+                user = profile;
+            } else {
+                gender = getGenderFromStorage();
+            }
+        }
+    } catch (error) {
+        gender = getGenderFromStorage();
+        user.gender = gender;
+    }
+    
+    return { user, gender };
+}
+
+
+
 function setUserGenderFromStorage(user) {
     if (!user.gender) {
         const savedGender = getGenderFromStorage();
@@ -147,6 +165,19 @@ function setUserGenderFromStorage(user) {
         }
     }
 }
+
+
+function getAvatarForGender(gender) {
+    if (gender === "male") {
+        return "/boy.png";
+    } else if (gender === "female") {
+        return "/woman.png";
+    } else {
+        return "/LoginOther.png";
+    }
+}
+
+
 
 export async function getUserProfile(token) {
     try {
@@ -175,15 +206,6 @@ function createDefaultUserInfos() {
     };
 }
 
-function getAvatarForGender(gender) {
-    if (gender === "male") {
-        return "/boy.png";
-    } else if (gender === "female") {
-        return "/woman.png";
-    } else {
-        return "/LoginOther.png";
-    }
-}
 
 function populateUserInfos(user, infos) {
     infos.id = user.id;
@@ -251,6 +273,30 @@ export function saveUserGender(gender) {
     
     return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export async function deleteUserAccount() {
     try {

@@ -34,11 +34,12 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
     };
 
     function findColumnByCardId(cardId) {
+        /* recherche la collone quand on donne une card precise*/
         for (let i = 0; i < columns.length; i++) { //on prend l'id de la carte et on cherche dans chaque colonne par alitération
             const column = columns[i];
             if (column.cards) {
                 for (let j = 0; j < column.cards.length; j++) {
-                    if (getCardId(column.cards[j]) === cardId) { //si on trouve la carte dans la colonne
+                    if (getCardId(column.cards[j]) === cardId) { //si on trouve la carte dans la colonne alors on renvoie cette colonne
                         return column;
                     }
                 }
@@ -48,6 +49,7 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
     };
 
     function findColumnById(columnId) {
+        
         for (let i = 0; i < columns.length; i++) {
             const colId = getColumnId(columns[i]);
             if (colId === columnId) {
@@ -59,21 +61,24 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
 
     function handleAddColumn() {
         const title = newColumnTitle.trim(); 
-        if (title) {
+        if (title) { //si le champs n'est pas vide
             if (onColumnAdd) {
                 onColumnAdd(title);
             }
-            setNewColumnTitle('');
+            setNewColumnTitle(''); //reset pour pas que les prochains affiche le meme titre
             setIsAddingColumn(false);
         } else {
             SendNotification("Column title cannot be empty", true, false);
         }
     };
 
+    /* debut du drag and drop */
     function handleDragStart(event) {
-        const activeData = event.active.data.current;
+        const activeData = event.active.data.current; //on prend les données de l'élément en cours de déplacement
         setIsDragging(true);
         
+
+
         if (activeData && activeData.type === "Card") {
             setActiveCard(activeData.card);
         } else if (activeData && activeData.type === "Column") {
@@ -81,15 +86,20 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
         }
     };
 
+    /* si on passe au dessus d'un element du meme type (card ou colonne)*/
     const handleDragOver = (event) => {
     };
 
+
+
     const handleDragEnd = (event) => {
+        
         
         setActiveCard(null);
         setActiveColumn(null);
         setIsDragging(false);
 
+        // si rien n'est cibler
         if (!event.over) {
             return;
         }
@@ -101,8 +111,8 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
             return;
         }
 
-        const activeData = event.active.data.current;
-        const overData = event.over.data.current;
+        const activeData = event.active.data.current; //les infos de la card / colonne qui se fait deplacer
+        const overData = event.over.data.current;//les infos de la card / colonne qui se fait survoler
 
         if (!activeData) {
             return;
@@ -110,29 +120,29 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
 
         try {
             if (activeData.type === "Column" && onMoveColumn) { //si on déplace une colonne
-                const isValidDrop = !overData || overData.type === "Column";
+                const isValidDrop = !overData || overData.type === "Column"; //on 
                 
                 if (isValidDrop) {
-                    let activeIndex = -1;
+                    let activeIndex = -1; // met l'index à non trouvé si ça reste -1
                     let overIndex = -1;
 
                     for (let i = 0; i < columns.length; i++) { //on verfie que la colonne déplacée et ou on drop est bien dans la liste des colonnes
                         const colId = getColumnId(columns[i]);
-                        if (colId === activeId) activeIndex = i; 
+                        if (colId === activeId) activeIndex = i;
                         if (colId === overId) overIndex = i;
                     }
 
                     if (activeIndex !== -1) {
-                        //si on ne trouve pas l'overIndex, on met à la fin
+                        //si on ne trouve pas le board a echanger, on met à la fin
                         if (overIndex === -1) {
                             overIndex = columns.length - 1;
                         }
                         
                         if (activeIndex !== overIndex) {
-                            const newColumns = [...columns];
-                            const [movedColumn] = newColumns.splice(activeIndex, 1);
-                            newColumns.splice(overIndex, 0, movedColumn);
-                            onMoveColumn(newColumns);
+                            const newColumns = [...columns]; //copie des cards 
+                            const [movedColumn] = newColumns.splice(activeIndex, 1); //retire la colonne deplacer
+                            newColumns.splice(overIndex, 0, movedColumn); //nouvelle position mise à jour
+                            onMoveColumn(newColumns); 
                         }
                     }
                 }
@@ -174,15 +184,16 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
             }
 
             if (activeData.type === "Card" && overData?.type === "Column" && onMoveCard) {
+                /* si une carte est mise sur une colonne*/
                 const activeColumn = findColumnByCardId(activeId);
                 const targetColumn = findColumnById(overId);
 
                 if (activeColumn && targetColumn && activeColumn.id !== targetColumn.id) {
-                    const activeCard = activeColumn.cards.find(card => getCardId(card) === activeId);
+                    const activeCard = activeColumn.cards.find(card => getCardId(card) === activeId); //recupere la carte concerner
                     if (activeCard) {
-                        const newSourceCards = activeColumn.cards.filter(card => getCardId(card) !== activeId);
-                        const newTargetCards = [...targetColumn.cards, activeCard];
-                        onMoveCard(activeId, activeColumn.id, targetColumn.id, newTargetCards, newSourceCards);
+                        const newSourceCards = activeColumn.cards.filter(card => getCardId(card) !== activeId); //cards restant dans la colonne visée  
+                        const newTargetCards = [...targetColumn.cards, activeCard]; //ajoute la carte a la fin
+                        onMoveCard(activeId, activeColumn.id, targetColumn.id, newTargetCards, newSourceCards); //remet a jours les colonnes
                     }
                 }
                 return;
@@ -192,69 +203,41 @@ export default function CardList({ columns = [],  onColumnAdd, onColumnEdit, onC
         }
     };
 
-    const columnIds = columns.map(column => getColumnId(column));
+    const columnIds = columns.map(column => getColumnId(column)); //fait un tableau contenant tout les id des  colonnes
 
     return (
-        <DndContext
-            sensors={sensors}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-        >
-            {/* Container principal avec scroll horizontal */}
-            <div 
-                ref={dragScroll.scrollContainerRef}
-                onMouseDown={dragScroll.handleMouseDown}
-                onMouseMove={dragScroll.handleMouseMove}
-                onMouseUp={dragScroll.handleMouseUp}
-                onMouseLeave={dragScroll.handleMouseLeave}
-                className="w-full h-[calc(100vh-180px)] horizontal-scroll p-6 bg-surface cursor-grab select-none"
-            >
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} >  {/* contexte du drag*/}
+            <div ref={dragScroll.scrollContainerRef}
+                onMouseDown={dragScroll.handleMouseDown} onMouseMove={dragScroll.handleMouseMove}
+                onMouseUp={dragScroll.handleMouseUp} onMouseLeave={dragScroll.handleMouseLeave} 
+                className="w-full h-[calc(100vh-180px)] horizontal-scroll p-6 bg-surface cursor-grab select-none">
+
+
+
+
+
                 <div className="flex gap-4 h-full" style={{ minWidth: 'max-content' }}>
-                    <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
-                        {/* Affichage des colonnes */}
+                    <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}> {/* permet de rendre triable (switch d'element)*/}
                         {columns.map(column => (
-                            <Column
-                                key={column.id}
-                                column={column}
-                                onCardClick={onCardClick}
-                                onOpenAddCard={onOpenAddCard}
-                                onDeleteColumn={onColumnDelete}
-                                onEditColumn={onColumnEdit}
-                                onToggleFavorite={onToggleFavorite}
-                            />
-                        ))}
+                            <Column key={column.id} column={column} onCardClick={onCardClick} onOpenAddCard={onOpenAddCard}
+                            onDeleteColumn={onColumnDelete} onEditColumn={onColumnEdit}
+                            onToggleFavorite={onToggleFavorite}/>))}
                     </SortableContext>
 
-                    {/* Bouton pour ajouter une nouvelle colonne */}
-                    <AddNewColumn
-                        isAddingColumn={isAddingColumn}
-                        setIsAddingColumn={setIsAddingColumn}
-                        newColumnTitle={newColumnTitle}
-                        setNewColumnTitle={setNewColumnTitle}
-                        handleAddColumn={handleAddColumn}
-                    />
+                    <AddNewColumn isAddingColumn={isAddingColumn} setIsAddingColumn={setIsAddingColumn} 
+                        newColumnTitle={newColumnTitle} setNewColumnTitle={setNewColumnTitle} handleAddColumn={handleAddColumn}/>
                 </div>
             </div>
 
-            {/* Overlay pour montrer l'élément en cours de drag */}
-            <DragOverlay>
+
+
+            <DragOverlay> {/* pour l'affichage temporaire*/}
                 {activeCard && (
-                    <Card 
-                        card={activeCard} 
-                        onClick={() => {}} 
-                        onToggleFavorite={() => {}} 
-                    />
+                    <Card card={activeCard} onClick={() => {}} onToggleFavorite={() => {}} />
                 )}
                 {activeColumn && (
-                    <Column
-                        column={activeColumn}
-                        onCardClick={() => {}}
-                        onOpenAddCard={() => {}}
-                        onDeleteColumn={() => {}}
-                        onEditColumn={() => {}}
-                        onToggleFavorite={() => {}}
-                    />
+                    <Column column={activeColumn} onCardClick={() => {}} onOpenAddCard={() => {}}
+                        onDeleteColumn={() => {}} onEditColumn={() => {}} onToggleFavorite={() => {}}/>
                 )}
             </DragOverlay>
         </DndContext>

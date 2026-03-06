@@ -58,7 +58,7 @@ export default function CardCreatePopup({ column, onClose, onCreate }) {
                     <input type="checkbox" checked={formData.favorite} onChange={e => setFormData({ ...formData, favorite: e.target.checked })}
                         disabled={isLoading} id="favorite-checkbox"/>
                     <label className="text-text text-sm">Favorite</label>
-                </div> //en dehors du return
+                </div> 
 
     return (
         <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] ${closing ? "animate-scaleOUT" : "animate-scaleIN"}`} onClick={SwipClose}>

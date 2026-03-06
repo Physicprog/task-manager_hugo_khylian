@@ -2,7 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import BoardDetailled from "./components/boardDetailled.jsx";
 
-function Boards() {
+
+export default function Boards() {
     const navigate = useNavigate();
 
     function goToBoardExample() {
@@ -26,4 +27,4 @@ function Boards() {
     );
 }
 
-export default Boards;
+

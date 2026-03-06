@@ -27,7 +27,7 @@ function getCardIds(cards) {
     for (let i = 0; i < cards.length; i++) {
         const card = cards[i];
         const cardId = card.documentId || card.id;
-        cardIds.push(cardId); //ectrait les IDs des cartes pour les trier
+        cardIds.push(cardId); //extrait les IDs des cartes pour les trier
     }
     return cardIds;
 }
@@ -47,7 +47,7 @@ function sortCardsByPosition(cards) {
     /*Trie les cartes par leur position pour les afficher dans le bon ordre */
     const sortedCards = [];
     for (let i = 0; i < cards.length; i++) { 
-        sortedCards.push(cards[i]);
+        sortedCards.push(cards[i]); 
     }
     
     sortedCards.sort(function(a, b) { //trie les cartes par position, l'index commence a 0

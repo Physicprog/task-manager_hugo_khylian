@@ -8,30 +8,30 @@ const close = '/Close.png';
 
 export default function Navbar({ userInfos, onLogout, onLoginClick, setView, currentView, onSearch, searchQuery,
     wantToAddSearch = true, isTemplateMode = false, onGoHome }) {
+    const WidthSize = 859 - (userInfos.username.length || 0);
 
     const navigate = useNavigate();
-
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 850);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < WidthSize);
     const [open, setOpen] = useState(false);
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
     const [AvatarMenuOpen, setAvatarMenuOpen] = useState(false);
 
     const themeIcon = theme === 'light' ? Sun : Moon;
 
+
     useEffect(() => {
         document.body.classList.remove('theme-light', 'theme-dark');
         document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
         localStorage.setItem('theme', theme);
-    }, [theme]); //a chaque changement de "theme", on met à jour
+    }, [theme]); //à chaque changement de "theme", on met à jour
 
     useEffect(() => {
         function SwipResize() {
-            setIsMobile(window.innerWidth < 850);
-            if (window.innerWidth >= 850) setOpen(false);
+            setIsMobile(window.innerWidth < WidthSize);
         }
 
         window.addEventListener('resize', SwipResize);
-        return () => window.removeEventListener('resize', SwipResize);
+        return () => window.removeEventListener("resize"); //pour pas empiler les resizes (se supprime quen on bouge plus l'ecran)
     }, []);
 
     function toggleTheme() {
@@ -45,7 +45,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
         }
     }
 
-    const handleGoHome = () => {
+    function handleGoHome () {
         if (setView) {
             setView("home");
         }
@@ -76,7 +76,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                                     <input type="search" placeholder="Search for a board..." className="w-[250px] px-4 py-2 rounded-lg bg-surface text-sm outline-none text-text" value={searchQuery || ""} onChange={handleSearchChange} />
                                 )}
                                 <button onClick={handleGoHome} className={`px-4 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "home" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>Home</button>
-                                <button onClick={() => setView && setView("projects")} className={`px-4 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
+                                <button onClick={() => setView && setView("projects")} className={`px-4 py-2 rounded-lg  white-space: nowrap border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
                             </div>
                         </div>
                     )}
@@ -144,7 +144,7 @@ export default function Navbar({ userInfos, onLogout, onLoginClick, setView, cur
                         ) : (
                             <button onClick={onLogout} className="flex-1 px-3 py-2 bg-red-500 text-white border-2 border-text rounded-lg text-sm hover:scale-105 active:scale-95 transition-all duration-200">Logout</button>
                         )}
-                        <button onClick={() => setView && setView("projects")} className={`flex-1 px-3 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
+                        <button onClick={() => setView && setView("projects")} className={`flex-1 px-3 py-2 rounded-lg border-2 border-text text-sm  hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "projects" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>My projects</button>
                         <button onClick={() => setView && setView("home")} className={`flex-1 px-3 py-2 rounded-lg border-2 border-text text-sm hover:scale-105 active:scale-95 transition-all duration-200 ${currentView === "home" ? "bg-accent1 text-white" : "bg-surface text-text"}`}>Home</button>
                     </div>
                 </div>

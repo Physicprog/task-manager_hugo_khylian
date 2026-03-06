@@ -81,8 +81,25 @@ export default function Home() {
     await loadProjects();
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   function filterProjectsByQuery(projects, query) {
-    return projects.filter(board =>
+    return projects.filter(board => 
       board.title.toLowerCase().includes(query.toLowerCase())
     );
   }
@@ -120,11 +137,6 @@ export default function Home() {
     setViewBeforeSearch(null);
   }
 
-  function incrementCloseMenu() {
-    /* si le closeMenu vaut 0 alors les menus sont fermer sinon
-     ils sont ouvert donc on change sa valeur pour forcer la fermeture des menus*/
-    setCloseMenu(closeMenu + 1);
-  }
 
   function handleViewChange(newView) {
     setView(newView);
@@ -133,6 +145,36 @@ export default function Home() {
     }
     incrementCloseMenu();
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  function incrementCloseMenu() {
+    /* si le closeMenu vaut 0 alors les menus sont fermer sinon
+     ils sont ouvert donc on change sa valeur pour forcer la fermeture des menus*/
+    setCloseMenu(closeMenu + 1);
+  }
+
+
 
 
   function checkIfDeletionInProgress(deletingAllBoardLoading) {
@@ -195,7 +237,7 @@ export default function Home() {
   }
 
 
-  /* Important: permet de charger les infos dès que l'utilisateur se connecte*/
+  /* permet de charger les infos dès que l'utilisateur se connecte*/
   useEffect(function() {
     const token = checkToken();
     if (!token) {
